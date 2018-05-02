@@ -6,8 +6,8 @@ namespace ConsoleApp1
 {
     public class HashItem<TKey, TValue>
     {
-        public TKey Key { get; set; }
-        public TValue Value { get; set; }
+        public TKey Key { get; private set; }
+        public TValue Value { get; private set; }
         public HashItem<TKey, TValue> Next { get; set; }
 
         public HashItem(TKey key, TValue value)
@@ -24,10 +24,13 @@ namespace ConsoleApp1
 
     public class HashMap<TKey, TValue> : IEnumerable<HashItem<TKey, TValue>>
     {
-        private const int DefaultTableSize = 8;
+        private const uint DefaultTableSize = 8;
 
         private readonly uint _tableSize;
         private HashItem<TKey, TValue>[] _table;
+        private uint _count;
+
+        public uint Count => _count;
 
         public HashMap() : this(DefaultTableSize) { }
 
@@ -48,7 +51,8 @@ namespace ConsoleApp1
 
         public void Add(TKey key, TValue value)
         {
-            var item = GetItemByKey(key, out uint hash);
+            var hash = GetHash(key);
+            var item = _table[hash];
             var newItem = new HashItem<TKey, TValue>(key, value);
 
             if (item == null)
@@ -57,11 +61,21 @@ namespace ConsoleApp1
             }
             else
             {
-                if (item.Key.Equals(newItem.Key))
-                    throw new InvalidOperationException(nameof(key));
+                var currItem = item;
+                var tempItem = currItem;
+                while (tempItem != null)
+                {
+                    if (tempItem.Key.Equals(newItem.Key))
+                        throw new InvalidOperationException(nameof(key));
 
-                GetNext(item).Next = newItem;
+                    currItem = tempItem;
+                    tempItem = tempItem.Next;
+                }
+
+                GetItemWithNullNext(currItem).Next = newItem;
             }
+
+            _count++;
         }
 
         public bool KeyExists(TKey key)
@@ -72,7 +86,26 @@ namespace ConsoleApp1
         public void Remove(TKey key)
         {
             var hash = GetHash(key);
-            _table[hash] = null;
+            var item = _table[hash];
+
+            HashItem<TKey, TValue> prevItem = null;
+            var currItem = item;
+            while (currItem != null)
+            {
+                if (currItem.Key.Equals(key))
+                {
+                    if (prevItem != null)
+                        prevItem.Next = currItem.Next;
+                    else
+                        _table[hash] = currItem.Next;
+                    
+                    _count--;
+                    break;
+                }
+
+                prevItem = currItem;
+                currItem = currItem.Next;
+            }
         }
 
         private uint GetHash(TKey key)
@@ -103,18 +136,18 @@ namespace ConsoleApp1
         {
             foreach (var item in _table)
             {
-                if (item != null)
+                if (item == null)
+                    continue;
+
+                yield return item;
+
+                var tempItem = item;
+                while (tempItem != null)
                 {
-                    yield return item;
+                    if (tempItem.Next != null)
+                        yield return tempItem.Next;
 
-                    var temp = item;
-                    while (temp != null)
-                    {
-                        if (temp.Next != null)
-                            yield return temp.Next;
-
-                        temp = temp.Next;
-                    }
+                    tempItem = tempItem.Next;
                 }
             }
         }
@@ -124,7 +157,7 @@ namespace ConsoleApp1
             return GetEnumerator();
         }
 
-        private HashItem<TKey, TValue> GetNext(HashItem<TKey, TValue> item)
+        private HashItem<TKey, TValue> GetItemWithNullNext(HashItem<TKey, TValue> item)
         {
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
@@ -132,7 +165,7 @@ namespace ConsoleApp1
             if (item.Next == null)
                 return item;
 
-            return GetNext(item.Next);
+            return GetItemWithNullNext(item.Next);
         }
 
         private HashItem<TKey, TValue> GetItemByKey(TKey key, out uint hash)
@@ -158,17 +191,20 @@ namespace ConsoleApp1
         {
             var map = new HashMap<int, string>();
             map.Add(1, "a");
-            map.Add(2, "b");
-            //map.Add(2, "c");
+            map.Add(2, "b");            
+            map.Add(3, "c");
+            //map.Add(3, "d");
 
             if (map.KeyExists(2))
-                Console.WriteLine(map.Lookup(2));
+                Console.WriteLine("Value: " + map.Lookup(2));
 
-            map.Remove(2);
-            map.Add(2, "d");
+            map.Remove(3);
+            map.Add(3, "e");
 
             foreach (var item in map)
                 Console.WriteLine(item);
+
+            Console.WriteLine("Count: " + map.Count);
 
             Console.WriteLine("Press any key...");
             Console.ReadKey();
