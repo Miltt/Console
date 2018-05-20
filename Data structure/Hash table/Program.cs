@@ -25,8 +25,7 @@ namespace ConsoleApp1
     public class HashMap<TKey, TValue> : IEnumerable<HashItem<TKey, TValue>>
     {
         private const uint DefaultTableSize = 8;
-
-        private readonly uint _tableSize;
+        
         private HashItem<TKey, TValue>[] _table;
         private uint _count;
 
@@ -36,13 +35,12 @@ namespace ConsoleApp1
 
         public HashMap(uint tableSize)
         {
-            _tableSize = tableSize;
             _table = new HashItem<TKey, TValue>[tableSize];
         }
 
         public TValue Lookup(TKey key)
         {
-            var item = GetItemByKey(key, out uint hash);
+            var item = GetItemByKey(key, out int hash);
             if (item != null)
                 return item.Value;
 
@@ -51,6 +49,9 @@ namespace ConsoleApp1
 
         public void Add(TKey key, TValue value)
         {
+            if (_table.Length == _count)
+                Grow();
+
             var hash = GetHash(key);
             var item = _table[hash];
             var newItem = new HashItem<TKey, TValue>(key, value);
@@ -80,7 +81,7 @@ namespace ConsoleApp1
 
         public bool KeyExists(TKey key)
         {
-            return GetItemByKey(key, out uint hash) != null;
+            return GetItemByKey(key, out int hash) != null;
         }
 
         public void Remove(TKey key)
@@ -108,20 +109,20 @@ namespace ConsoleApp1
             }
         }
 
-        private uint GetHash(TKey key)
+        private int GetHash(TKey key)
         {
             if (key.Equals(default(TKey)))
                 throw new ArgumentException(nameof(key));
 
-            return GetHashAdler32(key.ToString()) % _tableSize;
+            return GetHashAdler32(key.ToString()) % _table.Length;
         }
 
-        private uint GetHashAdler32(string value)
+        private int GetHashAdler32(string value)
         {
             const int module = 65521;
             const int numBit = 16;
-            uint s1 = 1;
-            uint s2 = 0;
+            int s1 = 1;
+            int s2 = 0;
 
             for (int i = 0; i < value.Length; i++)
             {
@@ -168,7 +169,7 @@ namespace ConsoleApp1
             return GetItemWithNullNext(item.Next);
         }
 
-        private HashItem<TKey, TValue> GetItemByKey(TKey key, out uint hash)
+        private HashItem<TKey, TValue> GetItemByKey(TKey key, out int hash)
         {
             hash = GetHash(key);
 
@@ -182,6 +183,14 @@ namespace ConsoleApp1
             }
 
             return null;
+        }
+
+        private void Grow()
+        {
+            var newSize = _table.Length << 1;
+            var newTable = new HashItem<TKey, TValue>[newSize];
+            _table.CopyTo(newTable, 0);
+            _table = newTable;
         }
     }
 
@@ -200,6 +209,13 @@ namespace ConsoleApp1
 
             map.Remove(3);
             map.Add(3, "e");
+
+            map.Add(4, "f");
+            map.Add(5, "g");
+            map.Add(6, "h");
+            map.Add(7, "i");
+            map.Add(8, "j");
+            map.Add(9, "k");
 
             foreach (var item in map)
                 Console.WriteLine(item);
