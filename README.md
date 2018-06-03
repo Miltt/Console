@@ -52,6 +52,7 @@ Implementation of popular algorithms and data structures
 - Red-Black tree
 - AVL tree
 - Disjoint-set (union–find)
+- Immutable Stack
 
 ## Graph
 - Adjacency matrix
