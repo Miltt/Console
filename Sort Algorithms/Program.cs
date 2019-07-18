@@ -152,7 +152,7 @@ namespace Sort
         {
             var array = new int[] { 8, 2, 3, 5, 6, 1, 7, 4, 0, 9 };
             
-            //SelectionSort(array); // test
+            //SelectionSort(array);
             //BubbleSort(array);
             //CocktailSort(array);
             //GnomeSort(array);
@@ -169,23 +169,19 @@ namespace Sort
 
         private static void Shift(int[] array, int curIndex, int curLength)
         {
-            var done = false;
             var maxChildIndex = 0;
 
-            while (2 * curIndex + 1 < curLength && !done)
+            while (2 * curIndex + 1 < curLength)
             {
-                if ((2 * curIndex + 1 == curLength - 1) || (array[2 * curIndex + 1] > array[2 * curIndex + 2]))
-                    maxChildIndex = 2 * curIndex + 1;
-                else
-                    maxChildIndex = 2 * curIndex + 2;
+                maxChildIndex = (2 * curIndex + 1 == curLength - 1) || (array[2 * curIndex + 1] > array[2 * curIndex + 2])
+                    ? 2 * curIndex + 1
+                    : 2 * curIndex + 2;
 
-                if (array[curIndex] < array[maxChildIndex])
-                {
-                    array.Swap(curIndex, maxChildIndex);
-                    curIndex = maxChildIndex;
-                }
-                else
-                    done = true;
+                if (array[curIndex] >= array[maxChildIndex])
+                    break;
+                
+                array.Swap(curIndex, maxChildIndex);
+                curIndex = maxChildIndex;
             }
         }
 
@@ -226,7 +222,7 @@ namespace Sort
         }
     }
 
-    public static class Helper
+    public static class ArrayExtensions
     {
         public static void Swap(this int[] array, int i, int j)
         {
