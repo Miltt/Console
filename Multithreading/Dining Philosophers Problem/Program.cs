@@ -6,8 +6,15 @@ namespace Philosophers
 {
     public class Fork
     {
+        private readonly object _sync = new object();
         private bool _canTake = true;
-        private object _sync = new object();
+
+        public int Num { get; }
+
+        public Fork(int num)
+        {
+            Num = num;
+        }
 
         public void Take()
         {
@@ -32,28 +39,30 @@ namespace Philosophers
 
     public sealed class Philosopher : IDisposable
     {
-        private const int MaxThinkDurationTime = 4000;
-        private const int MaxEatDurationTime = 2000;
+        private const int MaxThinkDurationMs = 4000;
+        private const int MaxEatDurationMs = 2000;
 
-        private Thread _thread;
-        private Fork _left;
-        private Fork _right;
-        private int _thinkDurationTime;
-        private int _eatDurationTime;
+        private readonly Fork _left;
+        private readonly Fork _right;
+        private readonly int _thinkDurationMs;
+        private readonly int _eatDurationMs;
         private bool _disposed;
 
-        public Philosopher(Fork left, Fork right, string threadName)
+        public string Name { get; }
+
+        public Philosopher(Fork left, Fork right, string name)
         {
-            _left = left;
-            _right = right;
+            _left = left ?? throw new ArgumentNullException(nameof(left));
+            _right = right ?? throw new ArgumentNullException(nameof(right));
+            
+            Name = name;
 
             var random = new Random();
-            _thinkDurationTime = random.Next(1, MaxThinkDurationTime);
-            _eatDurationTime = random.Next(1, MaxEatDurationTime);
+            _thinkDurationMs = random.Next(1, MaxThinkDurationMs);
+            _eatDurationMs = random.Next(1, MaxEatDurationMs);
 
-            _thread = new Thread(Start);
-            _thread.Name = threadName;
-            _thread.Start();
+            var thread = new Thread(Start);
+            thread.Start();
         }
 
         private void Start()
@@ -70,72 +79,88 @@ namespace Philosophers
         private void Think()
         {
             Log("Think...");
-            Thread.Sleep(_thinkDurationTime);            
+            Thread.Sleep(_thinkDurationMs);            
         }
 
         private void Eat()
         {
             Log("Eat...");
-            Thread.Sleep(_eatDurationTime);            
+            Thread.Sleep(_eatDurationMs);            
         }
 
         private void TakeForks()
         {
+            Log($"Take left fork {_left.Num}");
             _left.Take();
-            Log("Take left fork");
+            Log($"Take right fork {_right.Num}");
             _right.Take();
-            Log("Take right fork");
         }
 
         private void ReleaseForks()
         {
+            Log($"Release left fork {_left.Num}");
             _left.Release();
-            Log("Release left fork");
+            Log($"Release right fork {_right.Num}");
             _right.Release();
-            Log("Release right fork");
         }
 
         private void Log(string message)
         {
-            Console.WriteLine(string.Format("Philosopher {0}\t {1}", Thread.CurrentThread.Name, message));
+            Console.WriteLine($"Philosopher {Name}: {message}");
         }
 
         public void Dispose()
         {
             _disposed = true;
-            Log("Disposing...");
+            Log("Disposed");
         }
     }
 
     public class DiningTable : IDisposable
     {
-        private int _numPhilosophers;
-        private Dictionary<int, Fork> _forks;
-        private List<Philosopher> _philosophers;
+        private Philosopher[] _philosophers;
 
-        public DiningTable(int numPhilosophers)
+        public void Create(int numPhilosophers)
         {
-            _numPhilosophers = numPhilosophers;
-            _forks = new Dictionary<int, Fork>();
-            _philosophers = new List<Philosopher>();
+            if (numPhilosophers < 0)
+                throw new ArgumentException("Must be at least 0", nameof(numPhilosophers));
+            if (_philosophers != null)
+                Dispose();
+
+            _philosophers = new Philosopher[numPhilosophers];
+            var forks = new Fork[numPhilosophers];
+            
+            for (int i = 0; i < numPhilosophers; i++)
+            {
+                var forkLeft = GetOrCreateFork(forks, i > 0 ? i - 1 : numPhilosophers - 1);
+                var forkRight = GetOrCreateFork(forks, i);
+
+                var philosopher = new Philosopher(forkLeft, forkRight, i.ToString());
+
+                _philosophers[i] = philosopher;
+            }
         }
 
-        public void Create()
+        private Fork GetOrCreateFork(Fork[] forks, int i)
         {
-            for (var i = 0; i < _numPhilosophers; i++)
-                _forks.Add(i, new Fork());
-
-            for (var i = 0; i < _numPhilosophers; i++)
-            {
-                var numFork = i == 0 ? _numPhilosophers : i;
-                _philosophers.Add(new Philosopher(_forks[i], _forks[numFork - 1], i.ToString()));
-            }
+            var fork = forks[i];
+            if (fork != null)
+                return fork;
+                
+            fork = new Fork(i);
+            forks[i] = fork;
+            return fork;
         }
 
         public void Dispose()
         {
-            foreach (var p in _philosophers)
-                p.Dispose();
+            if (_philosophers == null)
+                return;
+            
+            for (int i = 0; i < _philosophers.Length; i++)
+                _philosophers[i]?.Dispose();
+            
+            _philosophers = null;
         }
     }
 
@@ -143,10 +168,9 @@ namespace Philosophers
     {
         static void Main(string[] args)
         {
-            var numPhilosophers = 5;
-            using (var table = new DiningTable(numPhilosophers))
+            using (var table = new DiningTable())
             {
-                table.Create();
+                table.Create(numPhilosophers: 5);
                 Console.ReadKey();
             }
             
