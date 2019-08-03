@@ -19,7 +19,7 @@ namespace MinSpanningTree
             _vertices = new Vertex[numVertices];
 
             for (int i = 0; i < numVertices; i++)
-				_vertices[i] = new Vertex();
+		_vertices[i] = new Vertex();
         }
 
         public void AddEdge(int v, int u, int weight)
@@ -46,18 +46,18 @@ namespace MinSpanningTree
 
     public class Vertex 
     {
-        private List<Edge> _edges = new List<Edge>();
+	private List<Edge> _edges = new List<Edge>();
 
-		public IReadOnlyCollection<Edge> Edges => _edges;
+	public IReadOnlyCollection<Edge> Edges => _edges;
 
-		public void AddEdge(Edge edge)
+	public void AddEdge(Edge edge)
         {
             if (edge is null)
                 throw new ArgumentNullException(nameof(edge));
             
             _edges.Add(edge);
         }
-	}
+    }
 
     public class Edge : IComparable<Edge> 
     {
