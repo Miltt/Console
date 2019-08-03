@@ -14,7 +14,7 @@ namespace MinSpanningTree
         public Graph(int numVertices)
         {
             if (numVertices < 0)
-                throw new ArgumentException(nameof(numVertices));
+                throw new ArgumentException("Must be at least 0", nameof(numVertices));
 
             _vertices = new Vertex[numVertices];
 
@@ -29,7 +29,7 @@ namespace MinSpanningTree
             if (u < 0 || u > _vertices.Length)
                 throw new ArgumentOutOfRangeException(nameof(u));
             if (weight < 0)
-                throw new ArgumentException(nameof(weight));
+                throw new ArgumentException("Must be at least 0", nameof(weight));
 
             _vertices[v].AddEdge(new Edge(v, u, weight));
             _vertices[u].AddEdge(new Edge(u, v, weight));
