@@ -45,9 +45,9 @@ namespace ReadersWriters
         }
     }
 
-        public class ReadersWritersProblem : IDisposable
+    public class ReadersWritersProblem : IDisposable
     {
-        private readonly SimpleSemaphore _semaphore = new SimpleSemaphore(2);
+        private readonly SimpleSemaphore _semaphore = new SimpleSemaphore(threadCountMax: 2);
         private readonly SimpleSemaphore _mutex = new SimpleSemaphore();
         private readonly Writer _writer = new Writer();
         private readonly Reader _reader = new Reader();
