@@ -3,138 +3,108 @@ using System.Threading;
 
 namespace ReadersWriters
 {
-    public class Writer
+    public sealed class SimpleSemaphore
     {
-        private const int PrepareTimeout = 1000;
-        private const int WriteTimeout = 2000;
+        private const int DefaultThreads = 1;
 
-        private bool _canWrite = true;
-        private object _sync = new object();
+        private readonly object _sync = new object();
+        private readonly int _threadCountMax;
+        private int _threadCount = 0;
 
-        public void Lock()
+        public SimpleSemaphore()
+            : this(DefaultThreads) { }
+
+        public SimpleSemaphore(int threadCountMax)
+        {
+            if (threadCountMax < 1)
+                throw new ArgumentException("Must be at least 1", nameof(threadCountMax));
+
+            _threadCountMax = threadCountMax;
+        }
+
+        public void Wait()
         {
             lock (_sync)
             {
-                if (!_canWrite)
+                if (_threadCount >= _threadCountMax)
                     Monitor.Wait(_sync);
 
-                _canWrite = false;
-                Log.Add("Lock");
+                _threadCount++;
             }
         }
 
-        public void Unlock()
+        public void Release()
         {
             lock (_sync)
             {
-                _canWrite = true;
-                Log.Add("Unlock");
-                Monitor.Pulse(_sync);                
+                _threadCount--;
+                
+                if (_threadCount < _threadCountMax)
+                    Monitor.Pulse(_sync);
             }            
         }
-
-        public void Prepare()
-        {
-            Log.Add("Prepare...");
-            Thread.Sleep(PrepareTimeout);
-        }
-
-        public void Write()
-        {
-            Log.Add("Write...");
-            Thread.Sleep(WriteTimeout);            
-        }
     }
 
-    public class Reader
+        public class ReadersWritersProblem : IDisposable
     {
-        private Writer _writer;
-        private object _sync = new object();
-        private int _numReaders;        
+        private readonly SimpleSemaphore _semaphore = new SimpleSemaphore(2);
+        private readonly SimpleSemaphore _mutex = new SimpleSemaphore();
+        private readonly Writer _writer = new Writer();
+        private readonly Reader _reader = new Reader();
+        private int _readersCount = 0;
+        private bool _disposed = false;
 
-        public Reader(Writer writer)
+        public ReadersWritersProblem(int readersCount)
         {
-            _writer = writer;
-        }
+            if (readersCount < 1)
+                throw new ArgumentException("Must be at least 1", nameof(readersCount));
 
-        public void Lock()
-        {
-            lock (_sync)
+            var writer = new Thread(Write);
+            writer.Name = nameof(Writer);
+            writer.Start();
+
+            for (int i = 0; i < readersCount; i++)
             {
-                _numReaders++;
-                if (_numReaders == 1)
-                    _writer.Lock();
+                var reader = new Thread(Read);
+                reader.Name = nameof(Reader) + i;
+                reader.Start();
             }
         }
 
-        public void Unlock()
+        private void Write()
         {
-            lock (_sync)
+            do 
+            {                                
+                _mutex.Wait();
+                _writer.Write();
+                _mutex.Release();
+
+                _writer.Sleep();
+
+            } while(!_disposed);
+        }
+
+        private void Read()
+        {
+            do 
             {
-                _numReaders--;
-                if (_numReaders == 0)
-                    _writer.Unlock();
-            }
-        }
+                _reader.Sleep();
 
-        public void Read()
-        {
-            Log.Add("Read...");
-            Thread.Sleep(2000);
-        }
+                _semaphore.Wait();
+                _readersCount++;
+                if (_readersCount == 1)                   
+                    _mutex.Wait();
+                _semaphore.Release();       
 
-        public void Use()
-        {
-            Log.Add("Use...");
-            Thread.Sleep(3000);
-        }
-    }
+                _reader.Read();
+                
+                _semaphore.Wait();
+                _readersCount--;
+                if (_readersCount == 0)
+                    _mutex.Release();
+                _semaphore.Release();
 
-    public sealed class Sync : IDisposable
-    {        
-        private Writer _writer;
-        private Reader _reader;
-        private int _numReaders;
-        private bool _disposed;
-
-        public Sync(int numReaders)
-        {
-            _numReaders = numReaders;
-
-            _writer = new Writer();
-            _reader = new Reader(_writer);
-        }
-
-        public void Start()
-        {
-            var threadWriter = new Thread(() =>
-            {
-                while (!_disposed)
-                {                
-                    _writer.Prepare();
-                    _writer.Lock();
-                    _writer.Write();
-                    _writer.Unlock();
-                }
-            });
-            threadWriter.Name = "Writer 0";
-            threadWriter.Start();
-
-            for (var i = 0; i < _numReaders; i++)
-            {
-                var threadReader = new Thread(() =>
-                {
-                    while (!_disposed)
-                    {
-                        _reader.Lock();
-                        _reader.Read();
-                        _reader.Unlock();
-                        _reader.Use();
-                    }
-                });
-                threadReader.Name = "Reader " + i.ToString();
-                threadReader.Start();
-            }
+            } while (!_disposed);
         }
 
         public void Dispose()
@@ -147,10 +117,8 @@ namespace ReadersWriters
     {
         static void Main(string[] args)
         {
-            var numReaders = 2;
-            using (var s = new Sync(numReaders))
+            using (var problem = new ReadersWritersProblem(readersCount: 2))
             {
-                s.Start();
                 Console.ReadKey();
             }
 
@@ -159,11 +127,42 @@ namespace ReadersWriters
         }    
     }
 
-    public static class Log
+    public sealed class Writer : Performer
     {
-        public static void Add(string text)
+        public override int ActionTimeoutMs => 3000;
+        public override int SleepTimeoutMs => 1000;
+
+        public void Write()
+            => Perform(nameof(Write));
+    }
+
+    public sealed class Reader : Performer
+    {
+        public override int ActionTimeoutMs => 1500;
+        public override int SleepTimeoutMs => 500;
+
+        public void Read() 
+            => Perform(nameof(Read));
+    }
+
+    public abstract class Performer
+    {
+        public abstract int ActionTimeoutMs { get; }
+        public abstract int SleepTimeoutMs { get; }
+
+        protected void Perform(string actionName)
         {
-            Console.WriteLine(string.Format("{0}\t : {1}", Thread.CurrentThread.Name, text));
+            Log(actionName);
+            Thread.Sleep(ActionTimeoutMs);
         }
+
+        public void Sleep()
+        {
+            Log(nameof(Sleep));
+            Thread.Sleep(SleepTimeoutMs);
+        }
+
+        private void Log(string message)
+            => Console.WriteLine($"{Thread.CurrentThread.Name}: {message}");
     }
 }
