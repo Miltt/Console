@@ -5,14 +5,14 @@ namespace ReadersWriters
 {
     public sealed class SimpleSemaphore
     {
-        private const int DefaultThreads = 1;
+        private const int DefaultThreadCount = 1;
 
         private readonly object _sync = new object();
         private readonly int _threadCountMax;
         private int _threadCount = 0;
 
         public SimpleSemaphore()
-            : this(DefaultThreads) { }
+            : this(DefaultThreadCount) { }
 
         public SimpleSemaphore(int threadCountMax)
         {
