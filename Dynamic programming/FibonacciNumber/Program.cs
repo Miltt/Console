@@ -4,43 +4,33 @@ namespace FibonacciNumber
 {
     public class Fibonacci
     {
-        public int NaiveCalc(int n)
+        public static int NaiveCalc(int n)
         {
-            var result = 0;
-
             if (n == 0)
-                result = 0;
-            else if (n == 1)
-                result = 1;
-            else
-                result = n > 0 
-                    ? NaiveCalc(n - 1) + NaiveCalc(n - 2) 
-                    : NaiveCalc(n + 2) - NaiveCalc(n + 1);
-
-            return result;
+                return 0;
+            if (n == 1)
+                return 1;
+            
+            return n > 0 
+                ? NaiveCalc(n - 1) + NaiveCalc(n - 2) 
+                : NaiveCalc(n + 2) - NaiveCalc(n + 1);
         }
 
-        public int MemoizationCalc(int n)
+        public static int MemoizationCalc(int n)
         {
-            var result = 0;
-
             if (n == 0)
-                result = 0;
-            else if (n == 1)
-                result = 1;
-            else
-            {
-                var memResults = new int[n + 1];
-                memResults[0] = 0;
-                memResults[1] = 1;
+                return 0;
+            if (n == 1)
+                return 1;
+            
+            var cache = new int[n + 1];
+            cache[0] = 0;
+            cache[1] = 1;
 
-                for (var i = 2; i <= n; i++)
-                    memResults[i] = memResults[i - 1] + memResults[i - 2];
+            for (int i = 2; i <= n; i++)
+                cache[i] = cache[i - 1] + cache[i - 2];
 
-                result = memResults[n];
-            }
-
-            return result;
+            return cache[n];
         }
     }
 
@@ -48,10 +38,8 @@ namespace FibonacciNumber
     {
         static void Main(string[] args)
         {
-            var fib = new Fibonacci();
-
-            Console.WriteLine(fib.NaiveCalc(8));
-            Console.WriteLine(fib.MemoizationCalc(9));
+            Console.WriteLine(Fibonacci.NaiveCalc(8));
+            Console.WriteLine(Fibonacci.MemoizationCalc(9));
 
             Console.WriteLine("Press any key...");
             Console.ReadKey();
