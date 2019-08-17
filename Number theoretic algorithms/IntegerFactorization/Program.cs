@@ -57,7 +57,7 @@ namespace IntegerFactorization
 
             var factorizator = new Factorizator();
 
-            var factors = new Factorizator().TrialDivision(n);
+            var factors = factorizator.TrialDivision(n);
             Console.WriteLine($"{n} = {factors.ToStr()}");
 
             var result = factorizator.FermatFactor(n);
