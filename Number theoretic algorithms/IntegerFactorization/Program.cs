@@ -7,6 +7,18 @@ namespace IntegerFactorization
 {
     public class Factorizator
     {
+        public struct Result
+        {
+            public int X;
+            public int Y;
+
+            public Result(int x, int y)
+            {
+                X = x + y;
+                Y = x - y;
+            }
+        }
+
         /// <summary>
         /// Based on a complete enumeration of all potential factors
         /// </summary>
@@ -65,18 +77,6 @@ namespace IntegerFactorization
 
             Console.WriteLine("Press any key...");
             Console.ReadKey();
-        }
-    }
-
-    public struct Result
-    {
-        public int X;
-        public int Y;
-
-        public Result(int x, int y)
-        {
-            X = x + y;
-            Y = x - y;
         }
     }
 
