@@ -1,64 +1,40 @@
 ﻿using System;
-using System.Linq;
 
 namespace KnapsackProblem
 {
-    public class Knapsack
+    public struct Item
     {
-        private readonly int _capacity;
-        private int[,] _result;
+        public int Weight;
+        public int Value;
 
-        public Knapsack(int capacity)
+        public Item(int weight, int value)
         {
-            if (capacity < 1)
-                throw new ArgumentException(nameof(capacity));
-
-            _capacity = capacity;
+            Weight = weight;
+            Value = value;
         }
+    }
 
-        public void Solve(int[] itemWeight, int[] itemValue)
+    public sealed class Knapsack
+    {
+        public Result Fill(Item[] items, int capacity)
         {
-            if (itemWeight.IsNullOrEmpty())
-                throw new ArgumentException(nameof(itemWeight));
-            if (itemValue.IsNullOrEmpty())
-                throw new ArgumentException(nameof(itemValue));
+            if (items is null)
+                throw new ArgumentNullException(nameof(items));
 
-            CalcResult(itemWeight, itemValue);
-            ShowBackTrack(itemWeight, itemWeight.Length - 1, _capacity - 1);
+            var result = new Result(items.Length + 1, capacity + 1);
 
-            Console.WriteLine($"Maximum value is: {_result[itemWeight.Length - 1, _capacity - 1]}");
-        }
-
-        private void CalcResult(int[] weight, int[] value)
-        {
-            _result = new int[weight.Length, _capacity];
-
-            for (var item = 1; item < weight.Length; item++)
+            for (var j = 1; j <= items.Length; j++)
             {
-                for (var j = 1; j < _capacity; j++)
+                for (var i = 1; i <= capacity; i++)
                 {
-                    if (j >= weight[item])
-                        _result[item, j] = Math.Max(_result[item - 1, j], _result[item - 1, j - weight[item]] + value[item]);
-                    else
-                        _result[item, j] = _result[item - 1, j];
+                    var item = items[j - 1];
+                    result.Track[i, j] = item.Weight <= i
+                        ? Math.Max(result.Track[i, j - 1], result.Track[i - item.Weight, j - 1] + item.Value)
+                        : result.Track[i, j - 1];
                 }
             }
-        }
 
-        private void ShowBackTrack(int[] weight, int i, int j)
-        {
-            if (_result[i, j] == 0)            
-                return;            
-
-            if (_result[i - 1, j] == _result[i, j])
-            {
-                ShowBackTrack(weight, i - 1, j);
-            }
-            else
-            {
-                ShowBackTrack(weight, i - 1, j - weight[i]);
-                Console.WriteLine($"Item: {i}");
-            }
+            return result;
         }
     }
 
@@ -66,23 +42,61 @@ namespace KnapsackProblem
     {
         static void Main(string[] args)
         {
-            var itemWeight = new int[] { 5, 10, 6, 5 };
-            var itemValue = new int[] { 3, 5, 4, 2 };
             var capacity = 14;
+            var items = new Item[] 
+            {
+                new Item(weight: 1, value: 13),
+                new Item(weight: 6, value: 5),
+                new Item(weight: 6, value: 4),
+                new Item(weight: 5, value: 2)
+            };
 
-            var knapsack = new Knapsack(capacity);
-            knapsack.Solve(itemWeight, itemValue);
-
+            var result = new Knapsack().Fill(items, capacity);
+            result.ShowBackTrack(items, capacity, items.Length);
+            Console.WriteLine($"Maximum value is: {result.GetMaxValue()}");
+            
             Console.WriteLine("Press any key...");
             Console.ReadKey();
         }
     }
 
-    public static class Helper
+    public class Result
     {
-        public static bool IsNullOrEmpty(this int[] collection)
+        public int[,] Track { get; }
+
+        public Result(int itemsCount, int capacity)
         {
-            return collection == null || !collection.Any();
+            if (itemsCount < 0)
+                throw new ArgumentException("Must be at least 0", nameof(itemsCount));
+            if (capacity < 0)
+                throw new ArgumentException("Must be at least 0", nameof(capacity));
+
+            Track = new int[capacity, itemsCount];
+        }
+
+        public int GetMaxValue()
+        {
+            return Track?[Track.GetLength(0) - 1, Track.GetLength(1) - 1] ?? 0;
+        }
+
+        public void ShowBackTrack(Item[] items, int i, int j)
+        {
+            if (items is null)
+                throw new ArgumentNullException(nameof(items));
+
+            if (Track is null || Track[i, j] == 0)
+                return;            
+
+            if (Track[i, j - 1] == Track[i, j])
+            {
+                ShowBackTrack(items, i, j - 1);
+            }
+            else
+            {
+                var item = items[j - 1];
+                ShowBackTrack(items, i - item.Weight, j - 1);
+                Console.WriteLine($"Item {j - 1}: Weight {item.Weight}, Value {item.Value}");
+            }
         }
     }
 }
