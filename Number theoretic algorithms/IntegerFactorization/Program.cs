@@ -10,31 +10,28 @@ namespace IntegerFactorization
         /// <summary>
         /// Based on a complete enumeration of all potential factors
         /// </summary>
-        public List<int> TrialDivision(int n)
+        public IEnumerable<int> TrialDivision(int n)
         {
-            var factors = new List<int>();
-
             var i = 2;
             while (i * i <= n)
             {
                 if (n % i == 0)
                 {
-                    n = n / i;
-                    factors.Add(i);
+                    n /= i;
+                    yield return i;
                 }
                 else
                     i = i == 2 ? i + 1 : i + 2;
             }
-
-            factors.Add(n);
-            return factors;
+            
+            yield return n;
         }
 
         /// <summary>
         /// Fermat's method is based on the representation of an odd integer as the difference of two squares:
-        /// N = a^2 - b^2 = (a + b) * (a - b)
+        /// N = x^2 - y^2 = (x + y) * (x - y)
         /// </summary>
-        public void FermatFactor(int n, out int a, out int b)
+        public Result FermatFactor(int n)
         {
             var x = (int)Math.Sqrt(n);
             var y = x * x - n;
@@ -45,14 +42,11 @@ namespace IntegerFactorization
                 y = x * x - n;
             }
 
-            a = x;
-            b = (int)Math.Sqrt(y);
+            return new Result(x, (int)Math.Sqrt(y));
         }
 
         private bool IsSquare(int n)
-        {
-            return Math.Sqrt(n) % 1 == 0;
-        }
+            => Math.Sqrt(n) % 1 == 0;
     }
 
     class Program
@@ -62,28 +56,40 @@ namespace IntegerFactorization
             var n = 89755;
 
             var factorizator = new Factorizator();
-            var result = factorizator.TrialDivision(n);
-            Console.WriteLine($"{n} = {result.ToStr()}");
 
-            int a, b;
-            factorizator.FermatFactor(n, out a, out b);
-            Console.WriteLine($"{n} = {a + b} {a - b}");
+            var factors = new Factorizator().TrialDivision(n);
+            Console.WriteLine($"{n} = {factors.ToStr()}");
+
+            var result = factorizator.FermatFactor(n);
+            Console.WriteLine($"{n} = {result.X} {result.Y}");
 
             Console.WriteLine("Press any key...");
             Console.ReadKey();
         }
     }
 
-    public static class Helper
+    public struct Result
     {
-        public static string ToStr<T>(this List<T> collection)
+        public int X;
+        public int Y;
+
+        public Result(int x, int y)
         {
-            if (collection == null || !collection.Any())
+            X = x + y;
+            Y = x - y;
+        }
+    }
+
+    public static class Extension
+    {
+        public static string ToStr<T>(this IEnumerable<T> source)
+        {
+            if (source is null)
                 return string.Empty;
 
             var sb = new StringBuilder();
 
-            foreach (var item in collection)
+            foreach (var item in source)
                 sb.Append($"{item} ");
 
             return sb.ToString();
