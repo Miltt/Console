@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Exponentiation
+namespace Exp
 {
     public class Exponentiation
     {
@@ -16,7 +16,7 @@ namespace Exponentiation
             if (b % 2 == 0)
                 return BinExp(c, 2) % mod;
             
-            return a * BinExp(c, 2) % mod;          
+            return a * BinExp(c, 2) % mod;
         }
 
         /// <summary>
