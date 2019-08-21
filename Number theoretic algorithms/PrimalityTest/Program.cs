@@ -1,9 +1,11 @@
 ﻿using System;
 
-namespace PrimalityTest
+namespace Prim
 {
     public class PrimalityTest
     {
+        private static readonly Random _random = new Random();
+
         public static bool Naive(int n)
         {
             if (n <= 1)
@@ -13,7 +15,7 @@ namespace PrimalityTest
             if (n % 2 == 0)            
                 return false;
 
-            for (var i = 3; i * i <= n; i += 2)
+            for (int i = 3; i * i <= n; i += 2)
             {
                 if (n % i == 0)                
                     return false;                
@@ -27,11 +29,8 @@ namespace PrimalityTest
             if (n == 1)
                 return false;
                             
-            var m = new Random().Next(1, n - 1);
-            if (GetGCD(m, n) != 1 || Pows(m, n - 1, n) != 1)
-                return false;
-
-            return true;
+            var m = _random.Next(1, n - 1);
+            return (GetGCD(m, n) == 1 && Pows(m, n - 1, n) == 1);
         }
 
         /// <summary>
@@ -39,9 +38,7 @@ namespace PrimalityTest
         /// </summary>
         private static int GetGCD(int a, int b)
         {
-            if (b == 0)
-                return a;
-            return GetGCD(b, a % b);
+            return b == 0 ? a : GetGCD(b, a % b);
         }
 
         /// <summary>
@@ -78,10 +75,10 @@ namespace PrimalityTest
     {
         static void Main(string[] args)
         {
-            var n = 127;
+            var n = 16769023;
 
-            Console.WriteLine($"Is prime: {PrimalityTest.Naive(n)}");
-            Console.WriteLine($"Is prime: {PrimalityTest.Fermat(n)}");
+            Console.WriteLine($"{n} is prime: {PrimalityTest.Naive(n)}");
+            Console.WriteLine($"{n} is prime: {PrimalityTest.Fermat(n)}");
 
             Console.WriteLine("Press any key..");
             Console.ReadKey();
