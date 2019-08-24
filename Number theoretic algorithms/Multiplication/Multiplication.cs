@@ -1,13 +1,13 @@
 ﻿using System;
 
-namespace Exponentiation
+namespace Mul
 {
     public class Multiplication
     {
-        private const double MinValue = 10;
+        private const int MinValue = 10;
 
         /// <summary>
-        /// Naive myltiple - O(n^2)
+        /// Naive multiple - O(n^2)
         /// </summary>
         public static long Naive(long a, long b)
         {
@@ -17,12 +17,12 @@ namespace Exponentiation
                 return a;
 
             var c = Naive(a, b / 2);
-            if (b % 2 == 0)            
-                return 2 * c;
-
-            return 2 * c + a;
+            return b % 2 == 0 ? 2 * c : 2 * c + a;
         }
 
+        /// <summary>
+        /// Russian peasant 
+        /// </summary>
         public static long Bitwise(long x, long y)
         {
             long result = 0;
@@ -40,51 +40,39 @@ namespace Exponentiation
         }
 
         /// <summary>
-        /// The Karatsuba algorithm is a fast multiplication algorithm
+        /// Karatsuba is a fast multiplication algorithm
         /// </summary>
         public static long Karatsuba(long x, long y)
         {
-            var xLength = GetLength(x);
-            var yLength = GetLength(y);
-
-            var n = Math.Max(xLength, yLength);
-            if (n < MinValue)
+            if (x < MinValue || y < MinValue)
                 return x * y;
 
-            long xL, xR;
-            long yL, yR;
-            SplitNumber(x, xLength, out xL, out xR);
-            SplitNumber(y, yLength, out yL, out yR);
+            var n = Math.Max(GetSize(x), GetSize(y));            
+            var m = (n / 2) + (n % 2);
+            var k = (long)Math.Pow(10, m);
 
-            long a = Karatsuba(xL, yL);
-            long b = Karatsuba(xR, yR);
-            long c = Karatsuba(xL + xR, yL + yR);
+            var a = (x / k);
+            var b = (x % k);
+            var c = (y / k);
+            var d = (y % k);
 
-            return (long)(a * Math.Pow(10, n) + (c - a - b) * Math.Pow(10, n / 2) + b);
+            var z0 = Karatsuba(a, c);
+            var z1 = Karatsuba(b, d);
+            var z2 = Karatsuba(a + b, c + d);
+
+            return ((long)Math.Pow(10, m * 2) * z0) + z1 + ((z2 - z1 - z0) * k);
         }
 
-        private static int GetLength(long value)
-        {
-            return (int)Math.Log10(value) + 1;
-        }
-
-        private static void SplitNumber(long value, int length, out long left, out long right)
-        {
-            if (length % 2 != 0)
-                length++;
-
-            var divider = (long)Math.Pow(10, length / 2);
-            left = value / divider;
-            right = value % divider;
-        }
+        private static int GetSize(long value)
+            => value == 0 ? 1 : 1 + (int)Math.Log10(Math.Abs(value));
     }
 
     class Program
     {
         static void Main(string[] args)
         {
-            var x = 1234567895;
-            var y = 989654321;
+            long x = 2345678925;
+            long y = 9896543210;
 
             Console.WriteLine(Multiplication.Karatsuba(x, y));
             Console.WriteLine(Multiplication.Bitwise(x, y));
