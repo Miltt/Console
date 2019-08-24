@@ -30,7 +30,7 @@ namespace Prim
                 return false;
                             
             var m = _random.Next(1, n - 1);
-            return (GetGCD(m, n) == 1 && Pows(m, n - 1, n) == 1);
+            return GetGCD(m, n) == 1 && Pows(m, n - 1, n) == 1;
         }
 
         /// <summary>
