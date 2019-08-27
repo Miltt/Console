@@ -6,51 +6,48 @@ namespace DataStructure
 {
     public class Node<T>
     {
-        public T Data { get; set; }
+        public T Data { get; }
         public Node<T> Next { get; set; }
         public Node<T> Previous { get; set; }
+
+        public Node(T data, Node<T> previous, Node<T> next)
+        {
+            Data = data;
+            Previous = previous;
+            Next = next;
+        }
     }
 
     public class DoublyLinkedList<T> : IEnumerable<Node<T>>
     {
-        private Node<T> _firstNode;
-        private Node<T> _lastNode;
-        private int _length;
-
-        public int Length { get { return _length; } }
-        public Node<T> FirstNode {  get { return _firstNode; } }
-        public Node<T> LastNode { get { return _lastNode; } }
+        public Node<T> First { get; private set; }
+        public Node<T> Last { get; private set; }
+        public int Length { get; private set; }
 
         public void AddFirst(T data)
         {
-            Node<T> tmpNode = null;
-            if (_firstNode != null)
-                tmpNode = _firstNode;
+            var tempNode = First != null ? First : null;
+            First = CreateNode(data, null, tempNode);
 
-            _firstNode = CreateNode(data, null, tmpNode);
+            if (tempNode != null)
+                tempNode.Previous = First;
+            if (Length == 0)
+                Last = First;
 
-            if (tmpNode != null)
-                tmpNode.Previous = _firstNode;
-            if (_length == 0)
-                _lastNode = _firstNode;
-
-            _length++;            
+            Length++;            
         }
 
         public void AddLast(T data)
         {
-            Node<T> tmpNode = null;
-            if (_lastNode != null)
-                tmpNode = _lastNode;
+            var tempNode = Last != null ? Last : null;
+            Last = CreateNode(data, tempNode, null);
 
-            _lastNode = CreateNode(data, tmpNode, null);
+            if (tempNode != null)
+                tempNode.Next = Last;
+            if (Length == 0)
+                First = Last;
 
-            if (tmpNode != null)
-                tmpNode.Next = _lastNode;
-            if (_length == 0)
-                _firstNode = _lastNode;
-
-            _length++;
+            Length++;
         }
 
         public Node<T> AddAfter(Node<T> node, T data)
@@ -60,10 +57,11 @@ namespace DataStructure
 
             var newNode = CreateNode(data, node, node.Next);
 
-            node.Next.Previous = newNode;
+            if (node.Next != null)
+                node.Next.Previous = newNode;
             node.Next = newNode;            
 
-            _length++;
+            Length++;
 
             return newNode;
         }
@@ -75,17 +73,19 @@ namespace DataStructure
 
             var newNode = CreateNode(data, node.Previous, node);
 
-            node.Previous.Next = newNode;
+            if (node.Previous != null)
+                node.Previous.Next = newNode;
             node.Previous = newNode;
 
-            _length++;
+            Length++;
 
             return newNode;
         }
 
         public Node<T> FindFirst(T data)
         {
-            var iterator = _firstNode;
+            var iterator = First;
+
             while (iterator != null)
             {
                 if (iterator.Data.Equals(data))
@@ -102,15 +102,15 @@ namespace DataStructure
             if (node == null)
                 throw new ArgumentNullException(nameof(node));
 
-            if (node == _firstNode)
+            if (node == First)
             {                
-                _firstNode = node.Next;
-                _firstNode.Previous = null;                
+                First = node.Next;
+                First.Previous = null;                
             }
-            else if (node == _lastNode)
+            else if (node == Last)
             {
-                _lastNode = node.Previous;
-                _lastNode.Next = null;                
+                Last = node.Previous;
+                Last.Next = null;                
             }
             else
             {
@@ -120,12 +120,12 @@ namespace DataStructure
 
             node = null;
 
-            _length--;
+            Length--;
         }
 
         public void Reverse()
         {
-            var current = _firstNode;
+            var current = First;
 
             while (current != null)
             {
@@ -137,19 +137,20 @@ namespace DataStructure
                 current = temp;
             }
 
-            current = _lastNode;
-            _lastNode = _firstNode;
-            _firstNode = current;
+            current = Last;
+            Last = First;
+            First = current;
         }
 
         private Node<T> CreateNode(T data, Node<T> prev, Node<T> next)
         {
-            return new Node<T> { Data = data, Previous = prev, Next = next };
+            return new Node<T>(data, prev, next);
         }
 
         public IEnumerator<Node<T>> GetEnumerator()
         {
-            var iterator = _firstNode;
+            var iterator = First;
+
             while (iterator != null)
             {
                 yield return iterator;
