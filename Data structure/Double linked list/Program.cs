@@ -22,7 +22,7 @@ namespace DataStructure
     {
         public Node<T> First { get; private set; }
         public Node<T> Last { get; private set; }
-        public int Length { get; private set; }
+        public int Count { get; private set; }
 
         public void AddFirst(T data)
         {
@@ -31,10 +31,10 @@ namespace DataStructure
 
             if (tempNode != null)
                 tempNode.Previous = First;
-            if (Length == 0)
+            if (Count == 0)
                 Last = First;
 
-            Length++;            
+            Count++;            
         }
 
         public void AddLast(T data)
@@ -44,10 +44,10 @@ namespace DataStructure
 
             if (tempNode != null)
                 tempNode.Next = Last;
-            if (Length == 0)
+            if (Count == 0)
                 First = Last;
 
-            Length++;
+            Count++;
         }
 
         public Node<T> AddAfter(Node<T> node, T data)
@@ -61,7 +61,7 @@ namespace DataStructure
                 node.Next.Previous = newNode;
             node.Next = newNode;            
 
-            Length++;
+            Count++;
 
             return newNode;
         }
@@ -77,7 +77,7 @@ namespace DataStructure
                 node.Previous.Next = newNode;
             node.Previous = newNode;
 
-            Length++;
+            Count++;
 
             return newNode;
         }
@@ -120,7 +120,7 @@ namespace DataStructure
 
             node = null;
 
-            Length--;
+            Count--;
         }
 
         public void Reverse()
