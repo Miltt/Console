@@ -2,59 +2,53 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace ConsoleApp1
+namespace DataStructure
 {
-    public class HashItem<TKey, TValue>
+    public class HashMap<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     {
-        public TKey Key { get; private set; }
-        public TValue Value { get; private set; }
-        public HashItem<TKey, TValue> Next { get; set; }
-
-        public HashItem(TKey key, TValue value)
+        private class HashItem
         {
-            Key = key;
-            Value = value;
+            public TKey Key { get; private set; }
+            public TValue Value { get; private set; }
+            public HashItem Next { get; set; }
+
+            public HashItem(TKey key, TValue value)
+            {
+                Key = key;
+                Value = value;
+            }
         }
 
-        public override string ToString()
-        {
-            return "Key: " + Key + " Value: " + Value;
-        }
-    }
-
-    public class HashMap<TKey, TValue> : IEnumerable<HashItem<TKey, TValue>>
-    {
-        private const uint DefaultTableSize = 8;
+        private const int DefaultTableSize = 8;
         
-        private HashItem<TKey, TValue>[] _table;
-        private uint _count;
+        private HashItem[] _table;
 
-        public uint Count => _count;
+        public int Count { get; private set; }
 
-        public HashMap() : this(DefaultTableSize) { }
+        public HashMap() 
+            : this(DefaultTableSize) { }
 
-        public HashMap(uint tableSize)
+        public HashMap(int tableSize)
         {
-            _table = new HashItem<TKey, TValue>[tableSize];
+            _table = new HashItem[tableSize];
         }
 
         public TValue Lookup(TKey key)
         {
-            var item = GetItemByKey(key, out int hash);
-            if (item != null)
-                return item.Value;
-
-            return default(TValue);
+            var item = GetItemByKey(key);
+            return item != null
+                ? item.Value
+                : default(TValue);
         }
 
         public void Add(TKey key, TValue value)
         {
-            if (_table.Length == _count)
+            if (_table.Length == Count)
                 Grow();
 
             var hash = GetHash(key);
             var item = _table[hash];
-            var newItem = new HashItem<TKey, TValue>(key, value);
+            var newItem = new HashItem(key, value);
 
             if (item == null)
             {
@@ -62,26 +56,28 @@ namespace ConsoleApp1
             }
             else
             {
-                var currItem = item;
-                var tempItem = currItem;
+                var tempItem = item;
                 while (tempItem != null)
                 {
                     if (tempItem.Key.Equals(newItem.Key))
-                        throw new InvalidOperationException(nameof(key));
-
-                    currItem = tempItem;
+                        throw new InvalidOperationException($"An item with the same key has already been added: {newItem.Key}");
+                    
+                    if (tempItem.Next == null)
+                    {
+                        tempItem.Next = newItem;
+                        break;
+                    }
+                    
                     tempItem = tempItem.Next;
                 }
-
-                GetItemWithNullNext(currItem).Next = newItem;
             }
 
-            _count++;
+            Count++;
         }
 
-        public bool KeyExists(TKey key)
+        public bool ExistsKey(TKey key)
         {
-            return GetItemByKey(key, out int hash) != null;
+            return GetItemByKey(key) != null;
         }
 
         public void Remove(TKey key)
@@ -89,7 +85,7 @@ namespace ConsoleApp1
             var hash = GetHash(key);
             var item = _table[hash];
 
-            HashItem<TKey, TValue> prevItem = null;
+            var prevItem = (HashItem)null;
             var currItem = item;
             while (currItem != null)
             {
@@ -100,7 +96,7 @@ namespace ConsoleApp1
                     else
                         _table[hash] = currItem.Next;
                     
-                    _count--;
+                    Count--;
                     break;
                 }
 
@@ -109,44 +105,20 @@ namespace ConsoleApp1
             }
         }
 
-        private int GetHash(TKey key)
-        {
-            if (key.Equals(default(TKey)))
-                throw new ArgumentException(nameof(key));
-
-            return GetHashAdler32(key.ToString()) % _table.Length;
-        }
-
-        private int GetHashAdler32(string value)
-        {
-            const int module = 65521;
-            const int numBit = 16;
-            int s1 = 1;
-            int s2 = 0;
-
-            for (int i = 0; i < value.Length; i++)
-            {
-                s1 = (s1 + value[i]) % module;
-                s2 = (s2 + s1) % module;
-            }
-
-            return (s2 << numBit) + s1;
-        }
-
-        public IEnumerator<HashItem<TKey, TValue>> GetEnumerator()
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
             foreach (var item in _table)
             {
                 if (item == null)
                     continue;
 
-                yield return item;
+                yield return KeyValuePair.Create(item.Key, item.Value);
 
                 var tempItem = item;
                 while (tempItem != null)
                 {
                     if (tempItem.Next != null)
-                        yield return tempItem.Next;
+                        yield return KeyValuePair.Create(tempItem.Next.Key, tempItem.Next.Value);
 
                     tempItem = tempItem.Next;
                 }
@@ -158,20 +130,9 @@ namespace ConsoleApp1
             return GetEnumerator();
         }
 
-        private HashItem<TKey, TValue> GetItemWithNullNext(HashItem<TKey, TValue> item)
+        private HashItem GetItemByKey(TKey key)
         {
-            if (item == null)
-                throw new ArgumentNullException(nameof(item));
-
-            if (item.Next == null)
-                return item;
-
-            return GetItemWithNullNext(item.Next);
-        }
-
-        private HashItem<TKey, TValue> GetItemByKey(TKey key, out int hash)
-        {
-            hash = GetHash(key);
+            var hash = GetHash(key);
 
             var item = _table[hash];
             while (item != null)
@@ -185,10 +146,18 @@ namespace ConsoleApp1
             return null;
         }
 
+        private int GetHash(TKey key)
+        {
+            if (key == null)
+                throw new ArgumentNullException(nameof(key));
+
+            return Hash.GetByAdler32(key.ToString()) % _table.Length;
+        }
+
         private void Grow()
         {
             var newSize = _table.Length << 1;
-            var newTable = new HashItem<TKey, TValue>[newSize];
+            var newTable = new HashItem[newSize];
             _table.CopyTo(newTable, 0);
             _table = newTable;
         }
@@ -224,6 +193,29 @@ namespace ConsoleApp1
 
             Console.WriteLine("Press any key...");
             Console.ReadKey();
+        }
+    }
+
+    public static class Hash
+    {   
+        private const int Module = 65521;
+        private const int NumBit = 16;
+
+        public static int GetByAdler32(string value)
+        {
+            if (value is null)
+                throw new ArgumentNullException(nameof(value));
+
+            var s1 = 1;
+            var s2 = 0;
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                s1 = (s1 + value[i]) % Module;
+                s2 = (s2 + s1) % Module;
+            }
+
+            return (s2 << NumBit) + s1;
         }
     }
 }
