@@ -1,26 +1,15 @@
 ﻿using System;
 
-namespace DynamicArray
+namespace DynArray
 {
-    public struct Item<T>
-    {
-        public T Value;       
-
-        public Item(T value)
-        {
-            Value = value;
-        }
-    }
-
     public class DynamicArray<T>
     {
-        private const int DefaultSize = 32;
+        private const int DefaultSize = 0;
 
-        private Item<T>[] _array;
+        private T[] _array;
 
         public int Length => _array.Length;
         public int Count { get; private set; }
-        public bool IsReadOnly => false;
 
         public DynamicArray() 
             : this(DefaultSize) { }
@@ -28,24 +17,16 @@ namespace DynamicArray
         public DynamicArray(int size)
         {
             if (size < 0)
-                throw new ArgumentException(nameof(size));
+                throw new ArgumentException("Must be at least 0", nameof(size));
 
-            _array = new Item<T>[size];
-        }
-
-        private void GrowArray()
-        {
-            var newSize = Length << 1;
-            var newArray = new Item<T>[newSize];
-            _array.CopyTo(newArray, 0);
-            _array = newArray;
+            _array = new T[size];
         }
 
         public int IndexOf(T value)
         {
-            for (var i = 0; i < Count; i++)
+            for (int i = 0; i < Count; i++)
             {
-                if (_array[i].Value.Equals(value))
+                if (_array[i].Equals(value))
                     return i;
             }
 
@@ -56,38 +37,33 @@ namespace DynamicArray
         {
             get
             {
-                if (index >= Length)
-                    throw new IndexOutOfRangeException(nameof(index));
-
-                return _array[index].Value;                
+                ThrowIfInvalidIndex(index);
+                return _array[index];                
             }
 
             set
             {
-                if (index >= Length)
-                    throw new IndexOutOfRangeException(nameof(index));
-
-                _array[index].Value = value;
+                ThrowIfInvalidIndex(index);
+                _array[index] = value;
             }
         }
 
         public void Add(int index, T value)
         {
-            if (index >= Length)
-                throw new IndexOutOfRangeException(nameof(index));
-            if (Length == Count)
-                GrowArray();
+            ThrowIfInvalidIndex(index);
+
+            if (_array.Length == Count)
+                Grow();
                         
             Array.Copy(_array, index, _array, index + 1, Count - index); // shift all items following index to the right
 
-            _array[index].Value = value;
+            _array[index] = value;
             Count++;
         }
 
         public void RemoveAt(int index)
         {
-            if (index >= Length)
-                throw new IndexOutOfRangeException(nameof(index));
+            ThrowIfInvalidIndex(index);
 
             var shiftStart = index + 1;
             if (shiftStart < Count)
@@ -98,15 +74,15 @@ namespace DynamicArray
 
         public void Add(T value)
         {
-            if (Length == Count)
-                GrowArray();
+            if (_array.Length == Count)
+                Grow();
 
-            _array[Count++].Value = value;
+            _array[Count++] = value;
         }
 
         public void Clear()
         {
-            _array = new Item<T>[0];
+            _array = new T[0];
             Count = 0;
         }
 
@@ -115,16 +91,16 @@ namespace DynamicArray
             return IndexOf(value) != -1;
         }
 
-        public void CopyTo(Item<T>[] array, int index)
+        public void CopyTo(T[] array, int index)
         {
             Array.Copy(_array, 0, array, index, Count);
         }
 
         public bool Remove(T value)
         {
-            for (var i = 0; i < Count; i++)
+            for (int i = 0; i < Count; i++)
             {
-                if (_array[i].Value.Equals(value))
+                if (_array[i].Equals(value))
                 {
                     RemoveAt(i);
                     return true;
@@ -132,6 +108,20 @@ namespace DynamicArray
             }
 
             return false;
+        }
+
+        private void ThrowIfInvalidIndex(int index)
+        {
+            if (index < 0 || index >= _array.Length)
+                throw new IndexOutOfRangeException("Index was outside the bounds of the array");
+        }
+
+        private void Grow()
+        {
+            var newSize = _array.Length << 1;
+            var newArray = new T[newSize];
+            _array.CopyTo(newArray, 0);
+            _array = newArray;
         }
     }
 
@@ -154,7 +144,6 @@ namespace DynamicArray
 
             array.RemoveAt(2);
             array[3] = 18;
-            Console.WriteLine($"Is read only: {array.IsReadOnly}");
 
             Console.WriteLine("Press any key...");
             Console.ReadKey();
