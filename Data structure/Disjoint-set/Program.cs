@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DisjointSet
+namespace Set
 {
     public class DisjointSet
     {
