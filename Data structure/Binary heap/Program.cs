@@ -2,51 +2,86 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BinaryHeap
+namespace Heap
 {
-    public class BinaryHeap
+    public sealed class BinaryMaxHeap : IEnumerable<int>
     {
-        private List<int> _items;
+        private int[] _items;
 
-        public int HeapSize => _items.Count;
+        public int Size => _items.Length;
 
-        public BinaryHeap(int[] array)
+        public BinaryMaxHeap(int[] array)
         {
-            _items = array.ToList();
-            for (var i = HeapSize / 2; i >= 0; i--)
+            _items = array ?? throw new ArgumentNullException(nameof(array));
+            
+            for (int i = _items.Length / 2; i >= 0; i--)
                 Heapify(i);
         }
 
         public void Add(int value)
         {
-            _items.Add(value);
+            var currentIndex = _items.Length - 1;
+            var parentIndex = GetParentIndex(currentIndex);
+            
+            _items[currentIndex] = value;
 
-            var current = HeapSize - 1;
-            var parent = (current - 1) / 2;
-
-            while (current > 0 && _items[parent] < _items[current])
+            while (currentIndex > 0 && _items[parentIndex] < _items[currentIndex])
             {
-                Swap(current, parent);
+                Swap(currentIndex, parentIndex);
 
-                current = parent;
-                parent = (current - 1) / 2;
+                currentIndex = parentIndex;
+                parentIndex = GetParentIndex(currentIndex);
             }
         }
 
-        public void Heapify(int i)
+        public IEnumerator<int> GetEnumerator()
+        {
+            for (int i = _items.Length - 1; i >= 0; i--)
+                yield return GetMax();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public int GetMax()
+        {
+            var result = _items[0];
+            _items[0] = _items[_items.Length - 1];
+
+            for (int a = _items.Length - 1; a < _items.Length - 1; a++)
+                _items[a] = _items[a + 1];
+            
+            Array.Resize(ref _items, _items.Length - 1);
+            Heapify(0);
+
+            return result;
+        }
+
+        private void Swap(int i, int j)
+        {
+            var temp = _items[i];
+            _items[i] = _items[j];
+            _items[j] = temp;
+        }
+
+        private int GetParentIndex(int index)
+            => (index - 1) / 2;
+
+        private void Heapify(int i)
         {
             int childLeft, childRight, childMax;
 
-            var complete = false;
-            while (2 * i + 1 < HeapSize && !complete)
+            while (2 * i + 1 < _items.Length)
             {
                 childLeft = 2 * i + 1;
                 childRight = 2 * i + 2;
                 childMax = i;
 
-                if (childLeft < HeapSize && _items[childLeft] > _items[childMax])
+                if (childLeft < _items.Length && _items[childLeft] > _items[childMax])
                     childMax = childLeft;
-                if (childRight < HeapSize && _items[childRight] > _items[childMax])
+                if (childRight < _items.Length && _items[childRight] > _items[childMax])
                     childMax = childRight;
 
                 if (_items[i] < _items[childMax])
@@ -55,25 +90,10 @@ namespace BinaryHeap
                     i = childMax;
                 }
                 else
-                    complete = true;
+                {
+                    break;                        
+                }
             }
-        }
-
-        public int GetMax()
-        {
-            int result = _items[0];
-
-            _items[0] = _items[HeapSize - 1];
-            _items.RemoveAt(HeapSize - 1);
-
-            return result;
-        }
-
-        private void Swap(int i, int j)
-        {
-            int temp = _items[i];
-            _items[i] = _items[j];
-            _items[j] = temp;
         }
     }
 
@@ -82,13 +102,10 @@ namespace BinaryHeap
         static void Main(string[] args)
         {
             var array = new int[] { 1, 8, 22, 7, 6, 2, 0, 5, 3, 4 };
-            var heap = new BinaryHeap(array);
+            var heap = new BinaryMaxHeap(array);
 
-            for (var i = array.Length - 1; i >= 0; i--)
-            {
-                Console.Write($"{heap.GetMax()} ");
-                heap.Heapify(0);
-            }
+            foreach (var item in heap)
+                Console.Write($"{item} ");
 
             Console.WriteLine("Press any key...");
             Console.ReadKey();
