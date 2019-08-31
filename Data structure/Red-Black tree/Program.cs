@@ -2,103 +2,34 @@
 
 namespace RBTree
 {
-    public enum EColor
+    public class RedBlackTree<T> 
+        where T : IComparable
     {
-        Red = 0,
-        Black = 1
-    }
-
-    public class Node<T>
-    {
-        public EColor Color { get; set; }
-        public Node<T> Left { get; set; }
-        public Node<T> Right { get; set; }
-        public Node<T> Parent { get; set; }
-        public T Data { get; set; }
-    }
-
-    public class RedBlackTree<T> where T : IComparable
-    {
-        private Node<T> _root;
-            
-        private void RotateLeft(Node<T> a)
+        private enum EColor
         {
-            var b = a.Right;
-            a.Right = b.Left;
-
-            if (b.Left != null)
-                b.Left.Parent = a;
-            if (b != null)
-                b.Parent = a.Parent;
-            if (a.Parent == null)
-                _root = b;
-            if (a == a.Parent.Left)
-                a.Parent.Left = b;
-            else
-                a.Parent.Right = b;
-
-            b.Left = a;
-            if (a != null)
-                a.Parent = b;
+            Red = 0,
+            Black = 1
         }
-            
-        private void RotateRight(Node<T> b)
-        {                
-            var a = b.Left;
-            b.Left = a.Right;
 
-            if (a.Right != null)
-                a.Right.Parent = b;
-            if (a != null)
-                a.Parent = b.Parent;
-            if (b.Parent == null)
-                _root = a;
-            if (b == b.Parent.Right)
-                b.Parent.Right = a;
-            else
-                b.Parent.Left = a;
-
-            a.Right = b;
-            if (b != null)
-                b.Parent = a;
-        }                        
-            
-        public Node<T> Find(T data)
+        private class Node
         {
-            var isFound = false;
-            var temp = _root;
+            public EColor Color { get; set; }
+            public Node Left { get; set; }
+            public Node Right { get; set; }
+            public Node Parent { get; set; }
+            public T Data { get; set; }
 
-            Node<T> item = null;
-            while (!isFound)
+            public Node(T data)
             {
-                if (temp == null)
-                    break;
-
-                var ret = data.CompareTo(temp.Data);
-                if (ret < 0) // data < temp.Data
-                    temp = temp.Left;
-                if (ret > 0) // >
-                    temp = temp.Right;
-                if (ret == 0) // ==
-                {
-                    item = temp;
-                    isFound = true;
-                }
+                Data = data;
             }
-
-            if (isFound)
-            {
-                Console.WriteLine("{0} was found", data);
-                return temp;
-            }
-            
-            Console.WriteLine("{0} not found", data);
-            return null;
         }
-            
+
+        private Node _root;
+
         public void Add(T data)
         {
-            var newNode = new Node<T> { Data = data };
+            var newNode = new Node(data);
 
             if (_root == null)
             {
@@ -107,8 +38,8 @@ namespace RBTree
                 return;
             }
 
-            Node<T> a = null;
-            Node<T> b = _root;
+            var a = (Node)null;
+            var b = _root;
 
             while (b != null)
             {
@@ -135,7 +66,103 @@ namespace RBTree
             AddFix(newNode);
         }
 
-        private void AddFix(Node<T> a)
+        public void Remove(T data)
+        {            
+            var a = Find(data);
+            if (a == null)
+                return;
+
+            var b = (Node)null;
+            var c = (Node)null;
+
+            if (a.Left == null || a.Right == null)
+                c = a;
+            else
+                c = Successor(a);
+
+            if (c.Left != null)
+                b = c.Left;
+            else
+                b = c.Right;
+
+            if (b != null)
+                b.Parent = c;
+
+            if (c.Parent == null)
+                _root = b;
+            else if (c == c.Parent.Left)
+                c.Parent.Left = b;
+            else
+                c.Parent.Left = b;
+
+            if (c != a)
+                a.Data = c.Data;
+
+            if (c.Color == EColor.Black)
+                RemoveFix(b);            
+        }
+            
+        private void RotateLeft(Node a)
+        {
+            var b = a.Right;
+            a.Right = b.Left;
+
+            if (b.Left != null)
+                b.Left.Parent = a;
+            if (b != null)
+                b.Parent = a.Parent;
+            if (a.Parent == null)
+                _root = b;
+            if (a == a.Parent.Left)
+                a.Parent.Left = b;
+            else
+                a.Parent.Right = b;
+
+            b.Left = a;
+            if (a != null)
+                a.Parent = b;
+        }
+            
+        private void RotateRight(Node b)
+        {                
+            var a = b.Left;
+            b.Left = a.Right;
+
+            if (a.Right != null)
+                a.Right.Parent = b;
+            if (a != null)
+                a.Parent = b.Parent;
+            if (b.Parent == null)
+                _root = a;
+            if (b == b.Parent.Right)
+                b.Parent.Right = a;
+            else
+                b.Parent.Left = a;
+
+            a.Right = b;
+            if (b != null)
+                b.Parent = a;
+        }                        
+            
+        private Node Find(T data)
+        {
+            var temp = _root;
+
+            while (temp != null)
+            {
+                var ret = data.CompareTo(temp.Data);
+                if (ret < 0) // data < temp.Data
+                    temp = temp.Left;
+                if (ret > 0) // >
+                    temp = temp.Right;
+                if (ret == 0) // ==
+                    return temp;
+            }
+            
+            return null;
+        }
+
+        private void AddFix(Node a)
         {                
             while (a != _root && a.Parent.Color == EColor.Red)
             {                    
@@ -165,9 +192,9 @@ namespace RBTree
                 }
                 else // mirror image of code above
                 {                    
-                    Node<T> b = null;
-
+                    var b = (Node)null;
                     b = a.Parent.Parent.Left;
+
                     if (b != null && b.Color == EColor.Black) // Case 1
                     {
                         a.Parent.Color = EColor.Red;
@@ -193,42 +220,7 @@ namespace RBTree
             }
         }
             
-        public void Remove(T data)
-        {            
-            var a = Find(data);
-            if (a == null)
-                return;
-
-            Node<T> b = null;
-            Node<T> c = null;
-            if (a.Left == null || a.Right == null)
-                c = a;
-            else
-                c = Successor(a);
-
-            if (c.Left != null)
-                b = c.Left;
-            else
-                b = c.Right;
-
-            if (b != null)
-                b.Parent = c;
-
-            if (c.Parent == null)
-                _root = b;
-            else if (c == c.Parent.Left)
-                c.Parent.Left = b;
-            else
-                c.Parent.Left = b;
-
-            if (c != a)
-                a.Data = c.Data;
-
-            if (c.Color == EColor.Black)
-                RemoveFix(b);            
-        }
-            
-        private void RemoveFix(Node<T> a)
+        private void RemoveFix(Node a)
         {
             while (a != null && a != _root && a.Color == EColor.Black)
             {
@@ -239,9 +231,7 @@ namespace RBTree
                     {
                         b.Color = EColor.Black; // case 1
                         a.Parent.Color = EColor.Red;
-
                         RotateLeft(a.Parent);
-
                         b = a.Parent.Right;
                     }
 
@@ -254,18 +244,14 @@ namespace RBTree
                     {
                         b.Left.Color = EColor.Black; // case 3
                         b.Color = EColor.Red;
-
                         RotateRight(b);
-
                         b = a.Parent.Right;
                     }
 
                     b.Color = a.Parent.Color; //case 4
                     a.Parent.Color = EColor.Black; 
                     b.Right.Color = EColor.Black;
-
                     RotateLeft(a.Parent);
-
                     a = _root; 
                 }
                 else //mirror code
@@ -275,9 +261,7 @@ namespace RBTree
                     {
                         b.Color = EColor.Black;
                         a.Parent.Color = EColor.Red;
-
                         RotateRight(a.Parent);
-
                         b = a.Parent.Left;
                     }
 
@@ -290,18 +274,14 @@ namespace RBTree
                     {
                         b.Right.Color = EColor.Black;
                         b.Color = EColor.Red;
-
                         RotateLeft(b);
-
                         b = a.Parent.Left;
                     }
 
                     b.Color = a.Parent.Color;
                     a.Parent.Color = EColor.Black;
                     b.Left.Color = EColor.Black;
-
                     RotateRight(a.Parent);
-
                     a = _root;
                 }
             }
@@ -310,7 +290,7 @@ namespace RBTree
                 a.Color = EColor.Black;
         }
 
-        private Node<T> Successor(Node<T> a)
+        private Node Successor(Node a)
         {
             if (a.Left != null)
             {
@@ -347,9 +327,6 @@ namespace RBTree
             tree.Add(1);
             tree.Add(9);
             tree.Remove(3);
-
-            var node = tree.Find(7);
-            Console.WriteLine($"Properties: {node.Data}, {node.Color}");
 
             Console.WriteLine("Press any key...");
             Console.ReadKey();
