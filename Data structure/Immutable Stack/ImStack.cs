@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace ConsoleApp1
+namespace Collections
 {
-    public interface IImStack<T> : IEnumerable<T>
+    public interface IImStack<T>
     {
         bool IsEmpty { get; }
         IImStack<T> Push(T value);
@@ -37,15 +37,13 @@ namespace ConsoleApp1
 
         public IImStack<T> Pop()
         {
-            if (IsEmpty)
-                throw new InvalidOperationException();
+            ThrowIfEmpty();
             return _tail;
         }
 
         public T Peek()
         {
-            if (IsEmpty)
-                throw new InvalidOperationException();
+            ThrowIfEmpty();
             return _head;
         }
 
@@ -63,6 +61,12 @@ namespace ConsoleApp1
         public IImStack<T> Clear()
         {
             return Empty;
+        }
+
+        private void ThrowIfEmpty()
+        {
+            if (IsEmpty)
+                throw new InvalidOperationException("The stack is empty");
         }
     }
 }
