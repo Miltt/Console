@@ -1,99 +1,112 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BinomialHeap
+namespace Collections
 {
-    public class Node
-    {        
-        public int Key { get; set; }
-        public int Degree { get; set; }
-        public Node Parent { get; set; }
-        public Node Child { get; set; }
-        public Node Sibling { get; set; }
-    }
-
-    public class BinomialHeap
+    public class BinomialHeap : IEnumerable<int>
     {
+        private class Node
+        {        
+            public int Key { get; set; }
+            public int Degree { get; set; }
+            public Node Parent { get; set; }
+            public Node Child { get; set; }
+            public Node Sibling { get; set; }
+
+            public Node(int key)
+            {
+                Key = key;
+            }
+        }
+
         private Node _heap;
         private Node _heapR;
 
-        public void Add(Node node)
+        public int Count { get; private set; }
+
+        public void Add(int key)
         {
+            var node = new Node(key);
+            
             _heap = Union(node);
+            Count++;
         }
 
-        public Node ExtractMin()
+        public bool TryExtractMin(out int key)
         {
             if (_heap == null)
             {
-                Console.WriteLine("Heap is empty");
-                return null;
+                key = 0;
+                return false;
             }
 
             _heapR = null;
-            var retHeap = _heap;
-            var tmpHeap = retHeap;
-            var min = retHeap.Key;
+            var retNode = _heap;
+            var tmpNode = retNode;
+            var minKey = retNode.Key;
 
-            Node tmpNode = null;
-            while (tmpHeap.Sibling != null)
+            var node = (Node)null;
+            while (tmpNode.Sibling != null)
             {
-                if (tmpHeap.Sibling.Key < min)
+                if (tmpNode.Sibling.Key < minKey)
                 {
-                    min = tmpHeap.Sibling.Key;
-                    tmpNode = tmpHeap;
-                    retHeap = tmpHeap.Sibling;
+                    minKey = tmpNode.Sibling.Key;
+                    node = tmpNode;
+                    retNode = tmpNode.Sibling;
                 }
 
-                tmpHeap = tmpHeap.Sibling;
+                tmpNode = tmpNode.Sibling;
             }
 
-            if (tmpNode == null && retHeap.Sibling == null)
+            if (node == null && retNode.Sibling == null)
                 _heap = null;
-            else if (tmpNode == null)
-                _heap = retHeap.Sibling;
-            else if (tmpNode.Sibling == null)
-                tmpNode = null;
+            else if (node == null)
+                _heap = retNode.Sibling;
+            else if (node.Sibling == null)
+                node = null;
             else
-                tmpNode.Sibling = retHeap.Sibling;
+                node.Sibling = retNode.Sibling;
 
-            if (retHeap.Child != null)
+            if (retNode.Child != null)
             {
-                Reverse(retHeap.Child);
-                retHeap.Child.Sibling = null;
+                Reverse(retNode.Child);
+                retNode.Child.Sibling = null;
             }
 
             _heap = Union(_heapR);
-            return retHeap;
+            Count--;
+
+            key = retNode.Key;
+            return true;
         }
 
         public void DecreaseKey(int curKey, int newKey)
         {
             if (newKey > curKey)
-                throw new InvalidOperationException("The new key cannot exceed the current");
+                throw new InvalidOperationException("The new key must not exceed the current key");
 
             var node = Find(_heap, curKey);
             if (node == null)
-                throw new KeyNotFoundException(nameof(curKey));
+                throw new InvalidOperationException("Сurrent key not found");
 
             node.Key = newKey;
+            var parentNode = node.Parent;
 
-            var parent = node.Parent;
-            while (parent != null && node.Key < parent.Key)
+            while (parentNode != null && node.Key < parentNode.Key)
             {
-                int temp = node.Key;
-                node.Key = parent.Key;
-                parent.Key = temp;
+                var tempKey = node.Key;
+                node.Key = parentNode.Key;
+                parentNode.Key = tempKey;
 
-                node = parent;
-                parent = parent.Parent;
+                node = parentNode;
+                parentNode = parentNode.Parent;
             }
         }
 
         public void Delete(int key)
         {
             DecreaseKey(key, int.MinValue);
-            ExtractMin();
+            TryExtractMin(out int minKey);
         }
 
         private void Link(Node child, Node parent)
@@ -106,67 +119,68 @@ namespace BinomialHeap
     
         private Node Union(Node node)
         {
-            var newHeap = Merge(node);
-            if (newHeap == null)            
-                return newHeap;
+            var newNode = Merge(node);
+            if (newNode == null)            
+                return newNode;
 
-            var currHeap = newHeap;            
-            var nextHeap = currHeap.Sibling;                       
+            var currNode = newNode;            
+            var nextNode = currNode.Sibling;
+            var prevNode = (Node)null;
 
-            Node prevHeap = null;
-            while (nextHeap != null)
+            while (nextNode != null)
             {
-                if ((currHeap.Degree != nextHeap.Degree) || (nextHeap.Sibling != null && nextHeap.Sibling.Degree == currHeap.Degree))
+                if ((currNode.Degree != nextNode.Degree) || 
+                    (nextNode.Sibling != null && nextNode.Sibling.Degree == currNode.Degree))
                 {
-                    prevHeap = currHeap;
-                    currHeap = nextHeap;
+                    prevNode = currNode;
+                    currNode = nextNode;
                 }
                 else
                 {
-                    if (currHeap.Key <= nextHeap.Key)
+                    if (currNode.Key <= nextNode.Key)
                     {
-                        currHeap.Sibling = nextHeap.Sibling;
-                        Link(nextHeap, currHeap);
+                        currNode.Sibling = nextNode.Sibling;
+                        Link(nextNode, currNode);
                     }
                     else
                     {
-                        if (prevHeap == null)
-                            newHeap = nextHeap;
+                        if (prevNode == null)
+                            newNode = nextNode;
                         else
-                            prevHeap.Sibling = nextHeap;
+                            prevNode.Sibling = nextNode;
 
-                        Link(currHeap, nextHeap);
-                        currHeap = nextHeap;
+                        Link(currNode, nextNode);
+                        currNode = nextNode;
                     }
                 }
 
-                nextHeap = currHeap.Sibling;
+                nextNode = currNode.Sibling;
 
-                if (nextHeap == currHeap)
-                    nextHeap = null;
+                if (nextNode == currNode)
+                    nextNode = null;
             }
 
-            return newHeap;
+            return newNode;
         }
      
         private Node Merge(Node node)
         {
-            Node newHeap = null;
+            var newNode = (Node)null;
 
             if (_heap != null)
             {
                 if (node != null)
                 {
                     if (_heap.Degree <= node.Degree)
-                        newHeap = _heap;
+                        newNode = _heap;
                     else if (_heap.Degree > node.Degree)
-                        newHeap = node;
+                        newNode = node;
                 }
                 else
-                    newHeap = _heap;
+                    newNode = _heap;
             }
             else
-                newHeap = node;
+                newNode = node;
 
             while (_heap != null && node != null)
             {
@@ -174,9 +188,9 @@ namespace BinomialHeap
                     _heap = _heap.Sibling;
                 else if (_heap.Degree == node.Degree)
                 {
-                    var tmpHeap = _heap.Sibling;
+                    var tmpNode = _heap.Sibling;
                     _heap.Sibling = node;
-                    _heap = tmpHeap;
+                    _heap = tmpNode;
                 }
                 else
                 {
@@ -186,30 +200,47 @@ namespace BinomialHeap
                 }
             }
 
-            return newHeap;
+            return newNode;
         }
      
-        private void Reverse(Node heap)
+        private void Reverse(Node node)
         {
-            if (heap.Sibling != null)
+            if (node.Sibling != null)
             {
-                Reverse(heap.Sibling);
-                heap.Sibling.Sibling = heap;
+                Reverse(node.Sibling);
+                node.Sibling.Sibling = node;
             }
             else
-                _heapR = heap;
+                _heapR = node;
         }
 
-        private Node Find(Node heap, int key)
+        private Node Find(Node node, int key)
         {
-            if (heap.Key == key)
-                return heap;
-            if (heap.Child != null)
-                return Find(heap.Child, key);
-            if (heap.Sibling != null)
-                return Find(heap.Sibling, key);
+            if (node.Key == key)
+                return node;
+            if (node.Child != null)
+                return Find(node.Child, key);
+            if (node.Sibling != null)
+                return Find(node.Sibling, key);
 
             return null;
+        }
+
+        public IEnumerator<int> GetEnumerator()
+        {
+            var count = Count;
+            var key = 0;
+
+            for (int i = 0; i <= count; i++)
+            {
+                if (TryExtractMin(out key))
+                    yield return key;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 
@@ -217,22 +248,21 @@ namespace BinomialHeap
     {        
         static void Main(string[] args)
         {
-            var binomialHeap = new BinomialHeap();
-            binomialHeap.Add(new Node { Key = 7 });
-            binomialHeap.Add(new Node { Key = 5 });
-            binomialHeap.Add(new Node { Key = 4 });
-            binomialHeap.Add(new Node { Key = 8 });
-            binomialHeap.Add(new Node { Key = 11 });
-            binomialHeap.Add(new Node { Key = 12 });
-            binomialHeap.Add(new Node { Key = 6 });
-            binomialHeap.Add(new Node { Key = 3 });
+            var heap = new BinomialHeap();
+            heap.Add(7);
+            heap.Add(5);
+            heap.Add(4);
+            heap.Add(8);
+            heap.Add(11);
+            heap.Add(12);
+            heap.Add(6);
+            heap.Add(3);
 
-            binomialHeap.DecreaseKey(5, 2);
-            binomialHeap.Delete(4);
+            heap.DecreaseKey(5, 2);
+            heap.Delete(4);
 
-            Node node;
-            while ((node = binomialHeap.ExtractMin()) != null)
-                Console.WriteLine(node.Key);
+            foreach (var key in heap)
+                Console.WriteLine(key);
 
             Console.WriteLine("Press any key...");
             Console.ReadKey();
