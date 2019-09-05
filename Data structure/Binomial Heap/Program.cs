@@ -257,7 +257,6 @@ namespace Collections
             heap.Add(12);
             heap.Add(6);
             heap.Add(3);
-
             heap.DecreaseKey(5, 2);
             heap.Delete(4);
 
