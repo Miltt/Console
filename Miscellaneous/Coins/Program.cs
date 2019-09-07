@@ -1,30 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Coins
+namespace Misc
 {
     public class Coins
     {
-        public static int Count(int[] s, int m, int n)
+        public static int CountCombinations(int[] coins, int coinsCount, int amount)
         {
-            if (n < 0 || m <= 0)
+            if (amount < 0 || coinsCount <= 0)
                 return 0;
-            if (n == 0)
+            if (amount == 0)
                 return 1;
             
-            return Count(s, m - 1, n) + Count(s, m, n - s[m - 1]);
+            return CountCombinations(coins, coinsCount - 1, amount)
+                 + CountCombinations(coins, coinsCount, amount - coins[coinsCount - 1]);
         }
 
-        public static void ShowAllCombination(int[] coins, int[] counts, int index, int amount)
+        public static void ShowCombinations(int[] coins, int[] counts, int index, int amount)
         {            
             if (index >= coins.Length)
             {
-                for (var i = 0; i < coins.Length; i++)
+                for (int i = 0; i < coins.Length; i++)
                     Console.Write($"{ counts[i]} * {coins[i]} ");
-
+                
                 Console.WriteLine();
                 return;
             }
@@ -34,15 +31,15 @@ namespace Coins
                 if (amount % coins[index] == 0)
                 {                    
                     counts[index] = amount / coins[index];                 
-                    ShowAllCombination(coins, counts, index + 1, 0);
+                    ShowCombinations(coins, counts, index + 1, 0);
                 }
             }
             else
             {
-                for (var i = 0; i <= amount / coins[index]; i++)
+                for (int i = 0; i <= amount / coins[index]; i++)
                 {                    
                     counts[index] = i;
-                    ShowAllCombination(coins, counts, index + 1, amount - coins[index] * i);                    
+                    ShowCombinations(coins, counts, index + 1, amount - coins[index] * i);              
                 }
             }
         }
@@ -52,12 +49,14 @@ namespace Coins
     {
         static void Main(string[] args)
         {
-            var coins = { 1, 2, 3 };
-            var count = new int[coins.Length];
-            var n = 4;
+            var coins = new int[] { 1, 2, 3 };
+            var amount = 4;
 
-            Console.WriteLine(Count(coins, coins.Length, n));
-            PrintAllCombination(coins, count, 0, n);
+            var numCombinations = Coins.CountCombinations(coins, coins.Length, amount);
+            Console.WriteLine(numCombinations);
+            
+            var count = new int[coins.Length];
+            Coins.ShowCombinations(coins, count, 0, amount);
 
             Console.WriteLine("Press any key...");
             Console.ReadKey();
