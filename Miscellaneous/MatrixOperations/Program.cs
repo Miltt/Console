@@ -24,6 +24,9 @@ namespace Mtrx
 
         public Matrix(int[,] matrix)
         {
+            if (matrix is null)
+                throw new ArgumentNullException(nameof(matrix));
+
             CountRows = matrix.GetLength(0);
             CountColumns = matrix.GetLength(1);
             _array = new int[CountRows, CountColumns];
@@ -36,7 +39,7 @@ namespace Mtrx
         }
 
         public bool Equals(Matrix matrix)
-        {            
+        {
             if (CountRows != matrix.CountRows || CountColumns != matrix.CountColumns)
                 return false;
             
