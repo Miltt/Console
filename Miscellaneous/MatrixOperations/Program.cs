@@ -1,45 +1,50 @@
 ﻿using System;
 using System.Text;
 
-namespace Matrix
+namespace Mtrx
 {
-    public class Matrix
+    public struct Matrix : IEquatable<Matrix>
     {
-        private const int RowDim = 0;
-        private const int ColumnDim = 1;
+        private int[,] _array;
 
-        private int[,] _matrix;
+        public int CountRows { get; private set; }
+        public int CountColumns { get; private set; }
 
-        public int Rows { get; private set; }
-        public int Columns { get; private set; }
-
-        public Matrix(int rows, int columns)
+        public Matrix(int countRows, int countColumns)
         {
-            if (rows <= 0 || columns <= 0)
-                throw new IndexOutOfRangeException();
+            if (countRows <= 0)
+                throw new ArgumentException("Must be at less 1", nameof(countRows)); 
+            if (countColumns <= 0)
+                throw new ArgumentException("Must be at less 1", nameof(countColumns));
 
-            Rows = rows;
-            Columns = columns;
-            _matrix = new int[rows, columns];
+            CountRows = countRows;
+            CountColumns = countColumns;
+            _array = new int[countRows, countColumns];
         }
 
         public Matrix(int[,] matrix)
         {
-            Rows = matrix.GetLength(RowDim);
-            Columns = matrix.GetLength(ColumnDim);
-            _matrix = (int[,])matrix.Clone();
+            CountRows = matrix.GetLength(0);
+            CountColumns = matrix.GetLength(1);
+            _array = new int[CountRows, CountColumns];
+
+            for (int i = 0; i < CountRows; i++)
+            {
+                for (int j = 0; j < CountColumns; j++)
+                    _array[i, j] = matrix[i, j];
+            }
         }
 
-        public bool IsEqual(Matrix matrix)
+        public bool Equals(Matrix matrix)
         {            
-            if (Rows != matrix.Rows || Columns != matrix.Columns)
+            if (CountRows != matrix.CountRows || CountColumns != matrix.CountColumns)
                 return false;
             
-            for (var i = 0; i < Rows; i++)
+            for (int i = 0; i < CountRows; i++)
             {
-                for (var j = 0; j < Columns; j++)
+                for (int j = 0; j < CountColumns; j++)
                 {
-                    if (_matrix[i, j] != matrix[i, j])                    
+                    if (_array[i, j] != matrix[i, j])                    
                         return false;
                 }
             }
@@ -49,73 +54,82 @@ namespace Matrix
 
         public void Transposition()
         {
-            var tmpMatrix = new int[Columns, Rows];
-            for (var i = 0; i < Rows; i++)
+            var array = new int[CountColumns, CountRows];
+            for (int i = 0; i < CountRows; i++)
             {
-                for (var j = 0; j < Columns; j++)
-                    tmpMatrix[j, i] = _matrix[i, j];
+                for (int j = 0; j < CountColumns; j++)
+                    array[j, i] = _array[i, j];
             }
 
-            Assign(tmpMatrix);
+            Reassign(array, CountColumns, CountRows);
         }
 
         public void Addition(Matrix matrix)
         {
-            if (Rows != matrix.Rows || Columns != matrix.Columns)
-                throw new Exception("Unequal sizes");
+            if (CountRows != matrix.CountRows)
+                throw new ArgumentException("The number of rows are not equals");
+            if (CountColumns != matrix.CountColumns)
+                throw new ArgumentException("The number of columns are not equals");
 
-            for (var i = 0; i < Rows; i++)
+            for (int i = 0; i < CountRows; i++)
             {
-                for (var j = 0; j < Columns; j++)
+                for (int j = 0; j < CountColumns; j++)
                 {
-                    var value = this[i, j] + matrix[i, j];
-                    this[i, j] = value;
+                    var value = _array[i, j] + matrix[i, j];
+                    _array[i, j] = value;
                 }
             }
         }
 
         public void Multiplication(Matrix matrix)
         {
-            if (Columns != matrix.Rows)
-                throw new ArgumentException("Invalid matrix size");
+            if (CountColumns != matrix.CountRows)
+                throw new ArgumentException("The number of columns must be equals to the number of rows");
 
-            var tmpMatrix = new int[Rows, matrix.Columns];
-            for (var i = 0; i < Rows; i++)
+            var array = new int[CountRows, matrix.CountColumns];
+            for (int i = 0; i < CountRows; i++)
             {
-                for (var j = 0; j < matrix.Columns; j++)
+                for (int j = 0; j < matrix.CountColumns; j++)
                 {
-                    for (var k = 0; k < Columns; k++)
-                        tmpMatrix[i, j] += this[i, k] * matrix[k, j];
+                    for (int k = 0; k < CountColumns; k++)
+                    {
+                        var value = _array[i, k] * matrix[k, j];
+                        array[i, j] += value;
+                    }
                 }
             }
 
-            Assign(tmpMatrix);
+            Reassign(array, CountRows, matrix.CountColumns);
         }
 
         public int this[int i, int j]
         {            
             get
             {
-                if (i < 0 || i >= Rows || j < 0 || j >= Columns)
-                    throw new IndexOutOfRangeException();
-
-                return _matrix[i, j];
+                ThrowIfIndexInvalid(i, j);
+                return _array[i, j];
             }
             
             set
             {
-                if (i < 0 || i >= Rows || j < 0 || j >= Columns)
-                    throw new IndexOutOfRangeException();
-
-                _matrix[i, j] = value;
+                ThrowIfIndexInvalid(i, j);
+                _array[i, j] = value;
             }
         }
 
-        private void Assign(int[,] matrix)
+        private void Reassign(int[,] array, int countRows, int countColumns)
         {
-            _matrix = matrix;
-            Rows = matrix.GetLength(RowDim);
-            Columns = matrix.GetLength(ColumnDim);
+            CountRows = countRows;
+            CountColumns = countColumns;
+            _array = array;
+        }
+
+        private void ThrowIfIndexInvalid(int i, int j)
+        {
+            if (i < 0 || i >= CountRows)
+                throw new IndexOutOfRangeException($"The index '{nameof(i)}' is outside the matrix");
+            if (j < 0 || j >= CountColumns)
+                throw new IndexOutOfRangeException($"The index '{nameof(j)}' is outside the matrix");
         }
     }
 
@@ -132,38 +146,35 @@ namespace Matrix
             a[1, 2] = 6;
             
             var c = new Matrix(new int[,]{ { 1, 2 }, { 3, 4 }, { 5, 7 } });
-            Console.WriteLine(a.IsEqual(c));
-            a.Output();
+            Console.WriteLine(a.Equals(c));
+            Show(a);
 
             c.Transposition();
-            c.Output();            
+            Show(c);          
             
             a.Addition(c);
-            a.Output();
+            Show(a);
             
             a.Multiplication(new Matrix(new int[,] { { 1, 2, 3, 4 }, { 5, 6, 7, 8 }, { 9, 10, 11, 12 } }));
-            a.Output();
+            Show(a);
 
             Console.WriteLine("Press any key...");
             Console.ReadKey();
         }
-    }
 
-    public static class Extensions
-    {
-        public static void Output(this Matrix matrix)
+        private static void Show(Matrix matrix)
         {
             var sb = new StringBuilder();
 
-            for (var i = 0; i < matrix.Rows; i++)
+            for (var i = 0; i < matrix.CountRows; i++)
             {
-                for (var j = 0; j < matrix.Columns; j++)
+                for (var j = 0; j < matrix.CountColumns; j++)
                     sb.Append($"{matrix[i, j]} ");
 
                 sb.AppendLine();
             }
 
-            Console.WriteLine(sb);
+            Console.WriteLine(sb.ToString());
         }
     }
 }
