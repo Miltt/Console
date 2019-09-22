@@ -19,7 +19,7 @@ namespace AdjacencyMatrix
             _vertices = new Vertex[verticesCount];
             
             for (int i = 0; i < _vertices.Length; i++)
-		        _vertices[i] = new Vertex($"{(char)('A' + i)}");
+		_vertices[i] = new Vertex($"{(char)('A' + i)}");
         }
 
         public void AddEdge(int parent, int child, int weight)
