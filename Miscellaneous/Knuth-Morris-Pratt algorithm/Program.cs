@@ -4,51 +4,47 @@ namespace KMPAlgorithm
 {
     public class KMP
     {
-        private string _pattern;
-        private string _text;
-
-        public KMP(string pattern, string text)
+        public static int Search(string text, string pattern)
         {
-            _pattern = pattern;
-            _text = text;
+            if (text is null)
+                throw new ArgumentNullException(nameof(text));
+            if (pattern is null)
+                throw new ArgumentNullException(nameof(pattern));
+
+            if (text.Length > 0 && pattern.Length > 0)
+            {
+                var prefixArray = GetPrefixArray(pattern);
+                var j = 0;
+
+                for (int i = 0; i < text.Length; i++)
+                {
+                    while (j > 0 && !pattern[j].Equals(text[i]))
+                        j = prefixArray[j - 1];
+
+                    if (pattern[j] == text[i])
+                        j++;
+                    if (j == pattern.Length)
+                        return i - j + 1;
+                }
+            }
+
+            return -1;
         }
 
-        private int[] GetPrefixFunc()
+        private static int[] GetPrefixArray(string pattern)
         {
-            var result = new int[_pattern.Length];
-            result[0] = 0;
+            var array = new int[pattern.Length];
+            var j = 0;
 
-            var k = 0;
-            for (var i = 1; i < _pattern.Length; i++)
+            for (var i = 1; i < pattern.Length; i++)
             {
-                while (k >= 0 && _pattern[k] != _pattern[i])
-                    k--;
+                while (j >= 0 && !pattern[j].Equals(pattern[i]))
+                    j--;
                                 
-                k++;
-                result[i] = k;
+                array[i] = ++j;
             }
 
-            return result;
-        }
-
-        public int Search()
-        {
-            var result = -1;
-            var k = 0;
-            var prefixFunc = GetPrefixFunc();            
-
-            for (int i = 0; i < _text.Length; i++)
-            {
-                while (k > 0 && _pattern[k] != _text[i])
-                    k = prefixFunc[k - 1];
-
-                if (_pattern[k] == _text[i])
-                    k++;
-                if (k == _pattern.Length)
-                    return result = i - k + 1;
-            }
-
-            return result;
+            return array;
         }
     }
 
@@ -58,7 +54,7 @@ namespace KMPAlgorithm
         {
             var text = "abcdabcabcdabcdab";
             var pattern = "abca";
-            Console.WriteLine(new KMP(pattern, text).Search());
+            Console.WriteLine(KMP.Search(text, pattern));
 
             Console.WriteLine("Press any key...");
             Console.ReadKey();
