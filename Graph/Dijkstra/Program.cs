@@ -2,103 +2,209 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dijkstra
+namespace GDijkstra
 {
     public class Dijkstra
     {
-        private IPerformer _performer;
-
-        public Dijkstra(IPerformer performer)
+        public static Distance Calc(Graph graph, int source)
         {
-            _performer = performer;
-        }
+            if (graph is null)
+                throw new ArgumentNullException(nameof(graph));
 
-        public void Calc(Graph graph, int source)
-        {
-            var distance = new int[graph.Vertexs.Count];
-            for (var i = 0; i < graph.Vertexs.Count; i++)
-                distance[i] = int.MaxValue;
-            distance[source] = 0; // distance from source to source
+            var distance = new Distance(graph.Vertices.Count, source);
 
-            while (graph.Vertexs.Count > 0)
+            while (graph.Vertices.Count > 0)
             {
-                var vertex = GetVertex(graph, distance); // vertex with min distance[]
-                graph.Vertexs.Remove(vertex);
+                var vertex = FindVertexByMinDistance(graph.Vertices, distance);
+                graph.RemoveVertex(vertex);
 
-                for (var i = 0; i < graph.Edges.Count; i++)
-                {
-                    if (graph.Edges[i].V == vertex)
-                    {
-                        var tmpDistance = distance[vertex] + GetWeight(graph, vertex, graph.Edges[i].U);
-                        if (tmpDistance < distance[graph.Edges[i].U]) // a shorter path to u has been found
-                            distance[graph.Edges[i].U] = tmpDistance;
-                    }
-                }                
+                foreach (var edge in vertex.Edges)
+                {                    
+                    var tempDistance = distance[vertex.Num] + edge.Weigth;
+                    if (tempDistance < distance[edge.U.Num]) // a shorter path to U has been found
+                        distance[edge.U.Num] = tempDistance;
+                }
             }
 
-            _performer.Perform(distance, source);
+            return distance;
         }
 
-        private int GetVertex(Graph graph, int[] distance)
+        private static Vertex FindVertexByMinDistance(IEnumerable<Vertex> vertices, Distance distance)
         {
-            var vertex = int.MinValue;
-            var min = int.MaxValue;
+            var vertex = (Vertex)default;                  
+            var minDistance = Distance.Infinity;
 
-            foreach (var i in graph.Vertexs)
+            foreach (var tempVertex in vertices)
             {
-                if (min > distance[i])
+                var tempDistance = distance[tempVertex.Num];
+                if (tempDistance <= minDistance)
                 {
-                    min = distance[i];
-                    vertex = i;
+                    minDistance = tempDistance;
+                    vertex = tempVertex;
                 }
-            }            
-
+            } 
+            
             return vertex;
-        }
-
-        private int GetWeight(Graph graph, int v, int u)
-        {
-            var weigth = int.MaxValue;
-
-            foreach (var i in graph.Edges)
-            {
-                if (i.V == v && i.U == u)
-                {
-                    weigth = i.Weigth;
-                    break;
-                }
-            }
-
-            return weigth;
         }
     }
 
     public class Graph
     {
-        public List<Edge> Edges { get; private set; } = new List<Edge>();
-        public HashSet<int> Vertexs { get; private set; } = new HashSet<int>();
+        private readonly List<Vertex> _vertices;
+        public IReadOnlyCollection<Vertex> Vertices => _vertices;
 
-        public void AddEdge(int vertexV, int vertexU, int weigth)
+        public Graph(int numVertices)
         {
-            Edges.Add(new Edge { V = vertexV, U = vertexU, Weigth = weigth });
-            Edges.Add(new Edge { V = vertexU, U = vertexV, Weigth = weigth });
-            Vertexs.Add(vertexU);
-            Vertexs.Add(vertexV);
+            _vertices = new List<Vertex>(numVertices);
+
+            for (int i = 0; i < numVertices; i++)
+                _vertices.Add(new Vertex(i));
+        }
+
+        public void AddEdge(int v, int u, int weight)
+        {
+            var vertexV = _vertices[v];
+            var vertexU = _vertices[u];
+
+            vertexV.AddEdge(vertexU, weight);
+            vertexU.AddEdge(vertexV, weight);
+        }
+
+        public void RemoveVertex(Vertex vertex)
+        {
+            _vertices.Remove(vertex);
+        }
+
+        public IEnumerable<Edge> GetEdges()
+        {
+            foreach (var vertex in _vertices)
+            {
+                foreach (var edge in vertex.Edges)
+                    yield return edge;
+            }
         }
     }
 
-    public class Edge
+    public readonly struct Vertex : IEquatable<Vertex>
     {
-        public int V { get; set; }
-        public int U { get; set; }
-        public int Weigth { get; set; }
+        private readonly List<Edge> _edges;
+        public int Num { get; }
+        public IReadOnlyCollection<Edge> Edges => _edges;
+
+        public Vertex(int num)
+        {
+            if (num < 0)
+                throw new ArgumentException("The vertext must be a positive number", nameof(num));
+            Num = num;
+            _edges = new List<Edge>();
+        }
+
+        public void AddEdge(Vertex u, int weight)
+        {
+            _edges.Add(new Edge(this, u, weight));
+        }
+
+        public bool Equals(Vertex other)
+        {
+            return Num == other.Num;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return HashCode.Combine(_edges, Num, Edges);
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Vertex other && this.Equals(other);
+        }
+
+        public override string ToString()
+        {
+            return "Vertex " + Num.ToString();
+        }
+
+        public static bool operator ==(Vertex left, Vertex right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Vertex left, Vertex right)
+        {
+            return !(left == right);
+        }
+    }
+
+    public readonly struct Edge
+    {
+        public Vertex V { get; }
+        public Vertex U { get; }
+        public int Weigth { get; }
+
+        public Edge(Vertex v, Vertex u, int weigth)
+        {
+            if (weigth < 0)
+                throw new ArgumentException("Must be at least 0", nameof(weigth));
+
+            V = v;
+            U = u;
+            Weigth = weigth;
+        }
+    }
+
+    public readonly struct Distance
+    {
+        public const int Infinity = int.MaxValue;
+        private const string From = "From ";
+        private const string To = " to ";
+
+        private readonly int[] _array;
+        private readonly int _source;
+
+        public Distance(int length, int source)
+        {
+            if (length <= 0)
+                throw new ArgumentException("Must be at least 1", nameof(length));
+            if (source < 0)
+                throw new ArgumentException("Must be at least 0", nameof(source));
+
+            _array = new int[length];
+            _source = source;
+
+            for (int i = 0; i < _array.Length; i++)
+                _array[i] = Infinity;
+            _array[_source] = 0; // distance from source to source
+        }
+
+        public int this[int index]
+        {
+            get { return _array[index]; }
+            set { _array[index] = value; }
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+
+            for (int i = 0; i < _array.Length; i++)
+            {
+                var distance = _array[i];
+                if (distance != Infinity)
+                    sb.AppendLine($"From {_source} to {i}: {distance}");
+            }
+
+            return sb.ToString();
+        }        
     }
 
     class Program
     {
         static void Main(string[] args)
         {
-            var graph = new Graph();
+            var graph = new Graph(numVertices: 15);
             graph.AddEdge(0, 1, 7);
             graph.AddEdge(0, 2, 9);
             graph.AddEdge(0, 5, 14);
@@ -109,28 +215,11 @@ namespace Dijkstra
             graph.AddEdge(3, 4, 6);
             graph.AddEdge(4, 5, 9);
 
-            new Dijkstra(new Performer()).Calc(graph, 0);
+            var distance = Dijkstra.Calc(graph, 0);
+            Console.WriteLine(distance);
             
             Console.WriteLine("Press any key..");
             Console.ReadKey();
-        }
-    }
-
-    public interface IPerformer
-    {
-        void Perform(int[] distance, int source);
-    }
-
-    public class Performer : IPerformer
-    {
-        private StringBuilder _sb = new StringBuilder();
-
-        public void Perform(int[] distance, int source)
-        {
-            for (var i = 0; i < distance.Length; i++)
-                _sb.AppendLine($"From {source} to {i}: {distance[i]}");
-
-            Console.WriteLine(_sb);
         }
     }
 }
