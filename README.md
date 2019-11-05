@@ -13,6 +13,10 @@ Implementation of popular algorithms and data structures
 - Heap Sort
 - Quick Sort
 
+## Searching algorithms
+- Linear search
+- Binary search
+
 ## Greedy algorithms
 - Prim's algorithm
 
@@ -51,7 +55,7 @@ Implementation of popular algorithms and data structures
 - Dynamic array
 - Red-Black tree
 - AVL tree
-- Disjoint-set (union–find)
+- Disjoint-set (unionâ€“find)
 - Immutable Stack
 
 ## Graph
