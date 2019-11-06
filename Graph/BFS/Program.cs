@@ -1,93 +1,154 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BFS
+namespace BFSGraph
 {
     public class BreadthFirstSearch
     {
-        private Graph _graph;
-        private bool[] _visited;
-        private Queue<int> _queue = new Queue<int>();
-
-        public int[] Distance { get; private set; }
-
-        public BreadthFirstSearch(Graph graph)
+        public readonly struct Visit
         {
-            _graph = graph;
-            _visited = new bool[graph.Vertexs.Count];
-            Distance = new int[graph.Vertexs.Count];
+            public bool IsVisited { get; }
+            public int Distance { get; }
+
+            public Visit(int distance)
+            {
+                if (distance < 0)
+                    throw new ArgumentException("Must be at least 0", nameof(distance));
+
+                IsVisited = true;
+                Distance = distance;
+            }
         }
 
-        public bool Start(int sourceVertex, int targetVertex)
+        public static bool TryGetDistance(Graph graph, Vertex source, Vertex target, out Visit[] visit)
         {
-            MarkAsVisited(sourceVertex, 0);
+            if (graph is null)
+                throw new ArgumentNullException(nameof(graph));
+            if (source is null)
+                throw new ArgumentNullException(nameof(source));
+            if (target is null)
+                throw new ArgumentNullException(nameof(target));
 
-            while (_queue.Count > 0)
+            visit = new Visit[graph.Count];
+            var queue = new Queue<Vertex>(graph.Count);
+
+            MarkAsVisited(source, 0, queue, visit);
+    
+            while (queue.Count > 0)
             {
-                var vertex = _queue.Dequeue();
-                if (vertex == targetVertex)                
+                var v = queue.Dequeue();
+                if (v == target)                
                     return true;
 
-                for (var i = 0; i < _graph.Edges.Count; i++)
-                {    
-                    if (_graph.Edges[i].U == vertex && !_visited[_graph.Edges[i].V])
-                        MarkAsVisited(_graph.Edges[i].V, Distance[vertex] + 1);
+                foreach (var edge in v.Edges)
+                {
+                    var u = edge.U;
+                    if (!visit[u.Num].IsVisited)
+                        MarkAsVisited(u, visit[v.Num].Distance + 1, queue, visit);
                 }
             }
 
             return false;
         }
 
-        private void MarkAsVisited(int vertex, int distance)
+        private static void MarkAsVisited(Vertex vertex, int distance, Queue<Vertex> queue, Visit[] visit)
         {
-            Distance[vertex] = distance;
-            _queue.Enqueue(vertex);
-            _visited[vertex] = true;
+            visit[vertex.Num] = new Visit(distance);
+            queue.Enqueue(vertex);
         }
     }
 
     public class Graph
     {
-        public List<Edge> Edges { get; private set; }
-        public HashSet<int> Vertexs { get; private set; }
+        private Vertex[] _vertices;
 
-        public Graph()
+        public int Count => _vertices.Length;
+
+        public Graph(int numVertices)
         {
-            Edges = new List<Edge>();
-            Vertexs = new HashSet<int>();
+            if (numVertices < 0)
+                throw new ArgumentException("Must be at least 0", nameof(numVertices));
+
+            _vertices = new Vertex[numVertices];
+            for (int i = 0; i < numVertices; i++)
+                _vertices[i] = new Vertex(i);
         }
 
-        public void AddEdge(int u, int v)
+        public void AddEdge(int v, int u)
         {
-            Edges.Add(new Edge { U = u, V = v });
-            Edges.Add(new Edge { U = v, V = u });
-            Vertexs.Add(u);
-            Vertexs.Add(v);
+            var vertexV = _vertices[v];
+            var vertexU = _vertices[u];
+
+            vertexV.AddEdge(new Edge(vertexV, vertexU));
+            vertexU.AddEdge(new Edge(vertexU, vertexV));
+        }
+
+        public Vertex this[int index]
+        {
+            get => _vertices[index];
+        }
+    }
+
+    public class Vertex 
+    {
+        private List<Edge> _edges = new List<Edge>();
+
+        public IReadOnlyCollection<Edge> Edges => _edges;
+        public int Num { get; }
+
+        public Vertex(int num)
+        {
+            Num = num;
+        }
+
+        public void AddEdge(Edge edge)
+        {
+            if (edge is null)
+                throw new ArgumentNullException(nameof(edge));
+            
+            _edges.Add(edge);
+        }
+
+        public override string ToString()
+        {
+            return Num.ToString();
         }
     }
 
     public class Edge
     {
-        public int U { get; set; }
-        public int V { get; set; }
+        public Vertex V { get; }
+        public Vertex U { get; }
+
+        public Edge(Vertex v, Vertex u) 
+        {
+            V = v;
+            U = u;
+        }
+
+        public override string ToString()
+        {
+            return $"{V} - {U}";
+        }
     }
 
     class Program
     {
         static void Main(string[] args)
         {
-            var graph = new Graph();
+            var graph = new Graph(numVertices: 5);
             graph.AddEdge(0, 1);
             graph.AddEdge(0, 2);
             graph.AddEdge(1, 3);
             graph.AddEdge(2, 3);
             graph.AddEdge(2, 4);
-            graph.AddEdge(3, 4);            
+            graph.AddEdge(3, 4);
 
-            var bfs = new BreadthFirstSearch(graph);
-            var isReachable = bfs.Start(1, 4);
-            if (isReachable)
-                Console.WriteLine(bfs.Distance[4]);
+            var source = graph[0];
+            var target = graph[4];
+
+            if (BreadthFirstSearch.TryGetDistance(graph, source, target, out BreadthFirstSearch.Visit[] visit))
+                Console.WriteLine(visit[target.Num].Distance);
             
             Console.WriteLine("Press any key...");
             Console.ReadKey();
