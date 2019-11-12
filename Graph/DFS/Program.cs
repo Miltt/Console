@@ -2,93 +2,154 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DFS
+namespace DFSGraph
 {
     public class DeepFirstSearch
     {
-        private Graph _graph;
-        private bool[] _visited;
-        private IPerformer _performer;
-
-        public DeepFirstSearch(Graph graph, IPerformer performer)
+        public readonly struct Result
         {
-            _graph = graph;
-            _performer = performer;
-            _visited = new bool[graph.Vertexs.Count];
+            private readonly bool[] _visit;
+            private readonly List<Vertex> _track;
+            public IReadOnlyCollection<Vertex> Track => _track;
+
+            public Result(int verticesCount)
+            {
+                if (verticesCount < 0)
+                    throw new ArgumentException("Must be at least 0", nameof(verticesCount));
+
+                _visit = new bool[verticesCount];
+                _track = new List<Vertex>();
+            }
+
+            public void MarkAsVisited(Vertex vertex)
+            {
+                if (vertex is null)
+                    throw new ArgumentNullException(nameof(vertex));
+
+                _visit[vertex.Num] = true;
+                _track.Add(vertex);
+            }
+
+            public bool IsVisited(Vertex vertex)
+            {       
+                if (vertex is null)
+                    throw new ArgumentNullException(nameof(vertex));
+
+                return _visit[vertex.Num];
+            }
         }
 
-        public void Start(int vertex)
+        public static Result Search(Graph graph, Vertex vertex)
         {
-            _visited[vertex] = true;
-            _performer.Perform(vertex);
+            var result = new Result(graph.Count);
+            SearchInternal(graph, vertex, result);
+            return result;
+        }
 
-            for (var i = 0; i < _graph.Edges.Count; i++)
+        private static void SearchInternal(Graph graph, Vertex vertex, Result result)
+        {
+            result.MarkAsVisited(vertex);
+
+            foreach (var edge in vertex.Edges)
             {
-                if (_graph.Edges[i].U == vertex && !_visited[_graph.Edges[i].V])                    
-                    Start(_graph.Edges[i].V);                    
+                if (!result.IsVisited(edge.U))
+                    SearchInternal(graph, edge.U, result);
             }
         }
     }
 
     public class Graph
     {
-        public List<Edge> Edges { get; private set; }
-        public HashSet<int> Vertexs { get; private set; }
+        private Vertex[] _vertices;
 
-        public Graph()
+        public int Count => _vertices.Length;
+
+        public Graph(int verticesCount)
         {
-            Edges = new List<Edge>();
-            Vertexs = new HashSet<int>();
+            if (verticesCount < 0)
+                throw new ArgumentException("Must be at least 0", nameof(verticesCount));
+
+            _vertices = new Vertex[verticesCount];
+            for (int i = 0; i < verticesCount; i++)
+                _vertices[i] = new Vertex(i);
         }
 
-        public void AddEdge(int u, int v)
+        public void AddEdge(int v, int u)
         {
-            Edges.Add(new Edge { U = u, V = v });
-            Edges.Add(new Edge { U = v, V = u });
-            Vertexs.Add(u);
-            Vertexs.Add(v);
+            var vertexV = _vertices[v];
+            var vertexU = _vertices[u];
+
+            vertexV.AddEdge(new Edge(vertexV, vertexU));
+            vertexU.AddEdge(new Edge(vertexU, vertexV));
+        }
+
+        public Vertex this[int index]
+        {
+            get => _vertices[index];
+        }
+    }
+
+    public class Vertex 
+    {
+        private List<Edge> _edges = new List<Edge>();
+
+        public IReadOnlyCollection<Edge> Edges => _edges;
+        public int Num { get; }
+
+        public Vertex(int num)
+        {
+            Num = num;
+        }
+
+        public void AddEdge(Edge edge)
+        {
+            if (edge is null)
+                throw new ArgumentNullException(nameof(edge));
+            
+            _edges.Add(edge);
+        }
+
+        public override string ToString()
+        {
+            return Num.ToString();
         }
     }
 
     public class Edge
     {
-        public int U { get; set; }
-        public int V { get; set; }
+        public Vertex V { get; }
+        public Vertex U { get; }
+
+        public Edge(Vertex v, Vertex u) 
+        {
+            V = v;
+            U = u;
+        }
+
+        public override string ToString()
+        {
+            return $"{V} - {U}";
+        }
     }
 
     class Program
     {
         static void Main(string[] args)
         {
-            var graph = new Graph();
-            graph.AddEdge(0, 1);
-            graph.AddEdge(0, 2);
-            graph.AddEdge(1, 3);
-            graph.AddEdge(2, 3);
-            graph.AddEdge(2, 4);
-            graph.AddEdge(3, 4);
+            var graph = new Graph(verticesCount: 5);
+            graph.AddEdge(v: 0, u: 1);
+            graph.AddEdge(v: 0, u: 2);
+            graph.AddEdge(v: 1, u: 3);
+            graph.AddEdge(v: 2, u: 3);
+            graph.AddEdge(v: 2, u: 4);
+            graph.AddEdge(v: 3, u: 4);
 
-            var performer = new Performer();
-            new DeepFirstSearch(graph, performer).Start(0);
-            Console.WriteLine(performer.Result);
+            var result = DeepFirstSearch.Search(graph, graph[0]);
+            foreach (var vertex in result.Track)
+                Console.Write($"{vertex.Num} ");
 
             Console.WriteLine("Press any key...");
             Console.ReadKey();
-        }
-    }
-
-    public interface IPerformer
-    {
-        void Perform(int data);
-    }
-
-    public class Performer : IPerformer
-    {
-        public StringBuilder Result { get; private set; } = new StringBuilder();
-
-        public void Perform(int data)
-        {
-            Result.AppendFormat($"{data} ");
         }
     }
 }
