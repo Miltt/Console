@@ -1,76 +1,68 @@
-# C#.NET Console
+# Console
+Implementation of popular algorithms and data structures using .NET Core
 
-Implementation of popular algorithms and data structures
+## Getting Started
+Prerequisites:
+* Install the latest version of .NET Core
+* Install the latest version of Visual Studio Code or Visual Studio
+* Get the code:
+* Open console.sln in Visual Studio Studio to build app
 
-## Sorting algorithms
-- Selection Sort
-- Bubble Sort
-- Cocktail Sort
-- Gnome Sort
-- Insertion Sort
-- Merge Sort
-- Shell sort
-- Heap Sort
-- Quick Sort
+## Implemented
+* Algorithms
+  * Cryptography
+    * RSA
+  * Dynamic Programming
+    * Knapsack Problem
+    * Fibonacci Number
+    * Longest common subsequence problem
+  * Greedy
+    * Prims
+  * Linear Programming
+    * Simplex Algorithm
+  * Miscellaneous
+    * Lucky Tickets
+  * Multithreading
+    * Dining Philosophers Problem
+    * Readers Writers Problem
+  * Number Theoretic
+    * Euclidean
+    * Exponentiation
+    * Factorization
+    * Multiplication
+    * Primality Test
+  * Searching
+    * Array
+      * Binary
+      * Linear
+    * Graph
+      * BFS
+      * DFS
+      * Dijkstra
+    * String
+      * Knuth-Morris-Pratt
+  * Simulated Annealing
+    * Travelling salesman problem
+  * Sorting
+    * Bubble
+    * Cocktail
+    * Gnome
+    * Heap
+    * Insertion
+    * Merge
+    * Quick
+    * Selection
+    * Shell
+* Data Structures
+  * Graph
+  * Heap
+  * Matrix
+  * Tree
+  * Disjoint Set
+  * Doubly Linked List
+  * Dynamic Array
+  * Hash Table
+  * Immutable Stack
 
-## Searching algorithms
-- Linear search
-- Binary search
-
-## Greedy algorithms
-- Prim's algorithm
-
-## Multithreading
-- Dining Philosophers problem
-- Readers Writers Problem
-
-## Simulated annealing
-- Travelling Salesman Problem
- 
-## Dynamic programming
-- Fibonacci Number with Memoization
-- Longest common subsequence problem
-- Knapsack problem
-
-## Number theoretic algorithms
-- Euclidean Algorithm
-- Extended Euclidean algorithm
-- Fermat Primality Test
-- Naive Primality Test
-- Trial Division (Integer Factorization)
-- Fermat's factorization method
-- Modular exponentiation
-- Binary exponentiation
-- Karatsuba multiplication algorithm
-- Bitwise multiplication algorithm
-
-## Cryptosystems
-- RSA
-
-## Data structure
-- Double linked list
-- Hash table
-- Binary heap
-- Binomial heap (priority queue)
-- Dynamic array
-- Red-Black tree
-- AVL tree
-- Disjoint-set (union–find)
-- Immutable Stack
-
-## Graph
-- Adjacency matrix
-- Deep-First Searh (DFS)
-- Breadth-First Search (BFS)
-- Dijkstra's algorithm
-
-## Linear programming
-- Simplex algorithm
-
-## Miscellaneous
-- Lucky Ticket
-- Tower of Hanoi
-- Knuth-Morris-Pratt algorithm
-- Matrix Operations
-- Coins change problem
-- Eight Queens Puzzle
+## License
+Licensed under the MIT License.
