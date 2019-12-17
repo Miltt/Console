@@ -1,19 +1,21 @@
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Miltt/Console/.NETCore)
+![license](https://img.shields.io/github/license/Miltt/Console)
+
 # Console
 Implementation of popular algorithms and data structures using .NET Core
 
 ## Getting Started
 Prerequisites:
-* Install the latest version of .NET Core
+* Install the latest version of [.NET Core](https://dotnet.microsoft.com/download)
 * Install the latest version of [Visual Studio Code](https://code.visualstudio.com/Download) or [Visual Studio](https://developer.microsoft.com/en-us/windows/downloads)
 * Get the code:
   ```
   git clone https://github.com/Miltt/Console.git
   ```
-* Open console.sln in Visual Studio to build app
-* To run the Tests
-
+* Open the solution to build the application `dotnet build` and run tests `dotnet test`
+  
 ## Implemented
-* Algorithms
+* **Algorithms**
   * Cryptography
     * RSA
   * Dynamic Programming
@@ -57,7 +59,7 @@ Prerequisites:
     * Quick
     * Selection
     * Shell
-* Data Structures
+* **Data Structures**
   * Graph
   * Heap
   * Matrix
@@ -70,4 +72,5 @@ Prerequisites:
 
 ## License
 Copyright (c) 2019 Ilya Moshanov
+
 Licensed under the [MIT License](./LICENSE).
