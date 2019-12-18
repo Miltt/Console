@@ -39,7 +39,7 @@ namespace Cnsl.DataStructures
 
         public TValue Lookup(TKey key)
         {
-            var item = GetItemByKey(key);
+            var item = FindItemByKey(key);
             return item != null
                 ? item.Value
                 : default(TValue);
@@ -81,7 +81,7 @@ namespace Cnsl.DataStructures
 
         public bool ExistsKey(TKey key)
         {
-            return GetItemByKey(key) != null;
+            return FindItemByKey(key) != null;
         }
 
         public void Remove(TKey key)
@@ -111,8 +111,9 @@ namespace Cnsl.DataStructures
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            foreach (var item in _table)
+            for (int i = 0; i < _table.Length; i++)
             {
+                var item = _table[i];
                 if (item == null)
                     continue;
 
@@ -134,7 +135,7 @@ namespace Cnsl.DataStructures
             return GetEnumerator();
         }
 
-        private HashItem GetItemByKey(TKey key)
+        private HashItem FindItemByKey(TKey key)
         {
             var hash = GetHash(key);
 
