@@ -1,5 +1,5 @@
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Miltt/Console/.NETCore)
-![license](https://img.shields.io/github/license/Miltt/Console)
+[![license](https://img.shields.io/github/license/Miltt/Console)](https://github.com/Miltt/Console/blob/master/LICENSE)
 
 # Console
 Implementation of popular algorithms and data structures using .NET Core
