@@ -23,17 +23,16 @@ namespace Cnsl.Algorithms.Searching
     
             while (queue.Count > 0)
             {
-                var v = queue.Dequeue();
-                if (v == target)
+                var vertex = queue.Dequeue();
+                if (vertex == target)
                     break;
 
-                foreach (var edge in v.Edges)
+                foreach (var edge in vertex.Edges)
                 {
-                    var u = edge.U;
-                    if (!result.IsVisited(u))
+                    if (!result.IsVisited(edge.U))
                     {
-                        result.MarkAsVisited(u);
-                        queue.Enqueue(u);
+                        result.MarkAsVisited(edge.U);
+                        queue.Enqueue(edge.U);
                     }
                 }
             }
