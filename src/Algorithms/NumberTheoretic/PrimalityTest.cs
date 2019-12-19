@@ -55,7 +55,7 @@ namespace Cnsl.Algorithms.NumberTheoretic
         }
 
         /// <summary>
-        /// (a ^ n) % p in O(log(y))
+        /// (a ^ n) % p in O(log(p))
         /// <summary>
         private static long Pow(long a, long n, long p) 
         { 
