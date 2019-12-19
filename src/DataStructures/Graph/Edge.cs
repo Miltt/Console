@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Cnsl.DataStructures
 {
@@ -37,9 +38,19 @@ namespace Cnsl.DataStructures
 
         public override bool Equals(object obj)
         {
-            return obj is IEdge other
-                ? V == other.V && U == other.U
-                : false;
+            return Equals(obj is IEdge);
+        }
+
+        public bool Equals(IEdge other)
+        {
+            if (Object.ReferenceEquals(other, null))
+                return false;
+            if (Object.ReferenceEquals(this, other))
+                return true;
+            if (this.GetType() != other.GetType())
+                return false;
+
+            return V == other.V && U == other.U;
         }
 
         public override int GetHashCode()
