@@ -35,21 +35,21 @@ namespace Cnsl.Algorithms.LinearProgramming
                 var pivot = GetPivot(funcCoefficients, result);
 
                 // create new table and calc all values except the pivot row and column
-                var tempTable = new double[result.Table.GetLength(RowDimension), result.Table.GetLength(ColumnDimensions)];
-                for (int i = 0; i < tempTable.GetLength(RowDimension); i++)
+                var table = new double[result.Table.GetLength(RowDimension), result.Table.GetLength(ColumnDimensions)];
+                for (int i = 0; i < table.GetLength(RowDimension); i++)
                 {
-                    for (int j = 0; j < tempTable.GetLength(ColumnDimensions); j++)
-                        tempTable[i, j] = (pivot.Value * result.Table[i, j] - result.Table[pivot.Row, j] * result.Table[i, pivot.Column]) / pivot.Value;
+                    for (int j = 0; j < table.GetLength(ColumnDimensions); j++)
+                        table[i, j] = (pivot.Value * result.Table[i, j] - result.Table[pivot.Row, j] * result.Table[i, pivot.Column]) / pivot.Value;
                 }
 
                 // calc of the remaining values of the pivot element
                 for (int i = 0; i < result.Table.GetLength(ColumnDimensions); i++)
-                    tempTable[pivot.Row, i] = result.Table[pivot.Row, i] / pivot.Value;
+                    table[pivot.Row, i] = result.Table[pivot.Row, i] / pivot.Value;
                 for (int i = 0; i < result.Table.GetLength(RowDimension); i++)
-                    tempTable[i, pivot.Column] = (result.Table[i, pivot.Column] / pivot.Value) * -1;
+                    table[i, pivot.Column] = (result.Table[i, pivot.Column] / pivot.Value) * -1;
 
-                tempTable[pivot.Row, pivot.Column] = 1 / pivot.Value;
-                result.Table = tempTable;
+                table[pivot.Row, pivot.Column] = 1 / pivot.Value;
+                result.Table = table;
             }
 
             return result;
