@@ -3,6 +3,7 @@ using System;
 namespace Cnsl.DataStructures
 {
     public class DynamicArray<T>
+        where T : IEquatable<T>
     {
         private const int DefaultSize = 0;
 
