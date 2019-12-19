@@ -43,8 +43,8 @@ Prerequisites:
       * Binary
       * Linear
     * Graph
-      * BFS
-      * DFS
+      * Breadth-first search
+      * Depth-first search
       * Dijkstra
     * String
       * Knuth-Morris-Pratt
