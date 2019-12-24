@@ -7,8 +7,8 @@ namespace Cnsl.Algorithms.NumberTheoretic
     {
         public static IEnumerable<uint> GetPrimeNumbers(uint limit)
         {
-            if (limit < 1)
-                throw new ArgumentException("Must be at least 1", nameof(limit));
+            if (limit < 3)
+                throw new ArgumentException("Must be at least 3", nameof(limit));
 
             var isPrime = new bool[limit + 1];
             isPrime[2] = true;
