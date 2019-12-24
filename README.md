@@ -33,11 +33,22 @@ Prerequisites:
     * Dining Philosophers Problem
     * Readers Writers Problem
   * Number Theoretic
-    * Euclidean
+    * Prime
+      * Primality Test
+      * Sieve of Atkin
     * Exponentiation
+      * Modular exponentiation
+      * Exponentiation by squaring
     * Factorization
+      * Trial division
+      * Fermat's method
+    * Greatest common divisor
+      * Euclidean algorithm
+      * Extended Euclidean algorithm
     * Multiplication
-    * Primality Test
+      * Recursive Naive
+      * Peasant (Binary, Bitwise)
+      * Karatsuba
   * Searching
     * Array
       * Binary
