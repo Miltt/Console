@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Tests.Algorithms.NumberTheoretic
 {
     [TestClass]
-    public class EuclideanTests
+    public class GCDTests
     {
         [TestMethod]
         public void NaiveTest()
@@ -12,24 +12,24 @@ namespace Tests.Algorithms.NumberTheoretic
             const int a = 816;
             const int b = 2260;
 
-            var result = Euclidean.Naive(a, b);
+            var result = GCD.EuclidNaive(a, b);
 
             const long expectedResult = 4;
 
-            Assert.IsTrue(result == expectedResult, "Euclidean algorithm has incorrect result");
+            Assert.IsTrue(result == expectedResult, "Euclidean naive algorithm has incorrect result");
         }
 
         [TestMethod]
-        public void ExtendedTest()
+        public void EuclidExtendedTest()
         {
             const int a = 816;
             const int b = 2260;
 
-            var result = Euclidean.Extended(a, b);
+            var result = GCD.EuclidExtended(a, b);
 
             const long expectedResult = 4;
 
-            Assert.IsTrue(result.D == expectedResult, "Euclidean algorithm has incorrect result");
+            Assert.IsTrue(result.D == expectedResult, "Euclidean extended algorithm has incorrect result");
         }
     }
 }

@@ -2,7 +2,7 @@ using System;
 
 namespace Cnsl.Algorithms.NumberTheoretic
 {
-    public class Euclidean
+    public class GCD
     {
         public readonly ref struct Result
         {
@@ -18,21 +18,29 @@ namespace Cnsl.Algorithms.NumberTheoretic
             }
         }
 
-        public static long Naive(long a, long b)
+        /// <summary>
+        /// Euclid algorithm for get greatest common divisor
+        /// </summary>
+        public static long EuclidNaive(long a, long b)
         {
             ThrowIfArgsInvalid(a, b);
 
-            return b == 0 ? a : Naive(b, a % b);
+            return a < b
+                ? EuclidNaive(b, a)
+                : a % b == 0 ? b : EuclidNaive(b, a % b);  
         }
 
-        public static Result Extended(long a, long b)
+        /// <summary>
+        /// Extended Euclid algorithm for get greatest common divisor
+        /// </summary>
+        public static Result EuclidExtended(long a, long b)
         {
             ThrowIfArgsInvalid(a, b);
 
             if (b == 0)
                 return new Result(x: 1, y: 0, d: a);
 
-            var result = Extended(b, a % b);
+            var result = EuclidExtended(b, a % b);
             return new Result(x: result.Y, y: result.X - (a / b) * result.Y, d: result.D);
         }
 

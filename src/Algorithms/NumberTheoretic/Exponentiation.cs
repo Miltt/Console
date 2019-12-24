@@ -13,7 +13,7 @@ namespace Cnsl.Algorithms.NumberTheoretic
             if (b == 0)
                 return 1;
 
-            var c = ModExp(a, b / 2, mod);
+            long c = ModExp(a, b / 2, mod);
             return b % 2 == 0
                 ? BinExp(c, 2) % mod
                 : a * BinExp(c, 2) % mod;
@@ -32,6 +32,57 @@ namespace Cnsl.Algorithms.NumberTheoretic
             return power % 2 == 0
                 ? BinExp(value * value, power / 2)
                 : value * BinExp(value * value, (power - 1) / 2);
+        }
+
+        public static long Pow(long value, long exponent, long modulus) 
+        { 
+            if (exponent == 0)
+                return 1;
+
+            long res = 1;
+            value = value % modulus;
+        
+            while (exponent > 0) 
+            {
+                if ((exponent & 1) == 1) 
+                    res = (res * value) % modulus;
+                
+                exponent = exponent >> 1;
+                value = (value * value) % modulus; 
+            }
+
+            return res; 
+        }
+
+        /// <summary>
+        /// Modular exponentiation
+        /// </summary>
+        public static long ModPow(long value, long exponent, long modulus)
+        {
+            if (exponent == 0)
+                return 1;
+
+            if (exponent % 2 == 0)
+            {
+                var res = ModPow(value, exponent / 2, modulus);
+                return Mul(res, res, modulus) % modulus;
+            }
+
+            return (Mul(ModPow(value, exponent - 1, modulus), value, modulus)) % modulus;
+        }
+
+        private static long Mul(long value, long exponent, long modulus)
+        {
+            if (exponent == 1)                
+                return value;
+
+            if (exponent % 2 == 0)
+            {
+                var res = Mul(value, exponent / 2, modulus);
+                return (2 * res) % modulus;
+            }
+
+            return (Mul(value, exponent - 1, modulus) + value) % modulus;
         }
     }
 }
