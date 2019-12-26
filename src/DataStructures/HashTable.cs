@@ -6,6 +6,7 @@ using Cnsl.Common.Extensions;
 namespace Cnsl.DataStructures
 {
     public class HashTable<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
+        where TKey : IEquatable<TKey>
     {
         private class HashItem
         {
