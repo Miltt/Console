@@ -7,7 +7,7 @@ namespace Cnsl.Common.Extensions
         public static long Next(this Random random, long minValue, long maxValue)
         {
             if (maxValue <= minValue)
-                throw new ArgumentException("Ьust be greater than the min value", nameof(maxValue));
+                throw new ArgumentException("Must be greater than the min value", nameof(maxValue));
 
             var range = (ulong)(maxValue - minValue);
             var value = (ulong)0;
