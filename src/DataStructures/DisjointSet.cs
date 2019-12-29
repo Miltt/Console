@@ -16,6 +16,8 @@ namespace Cnsl.DataStructures
             }
         }
 
+        public const int Unknown = -1;
+
         private readonly Item[] _set;
 
         public DisjointSet(int size)
@@ -28,7 +30,9 @@ namespace Cnsl.DataStructures
         }
 
         public int Find(int item)
-            => Find(_set[item]).Value;
+            => item > 0 && item < _set.Length
+                ? Find(_set[item]).Value
+                : Unknown;
 
         public void Union(int itemX, int itemY)
             => Union(_set[itemX], _set[itemY]);
