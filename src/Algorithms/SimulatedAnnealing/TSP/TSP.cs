@@ -6,9 +6,25 @@ namespace Cnsl.Algorithms.SimulatedAnnealing
     public class TSP
     {
         private const int DefaultIterationsCount = 10000;
-        private const double TemperatureDecreaseRatio = 0.1;
+        private const double DefaultTemperatureDecreaseRatio = 0.1;
         
         private readonly Random _random = new Random();
+        private readonly int _iterationsCount;
+        private readonly double  _temperatureDecreaseRatio;
+
+        public TSP() 
+            : this (DefaultIterationsCount, DefaultTemperatureDecreaseRatio) { }
+
+        public TSP(int iterationsCount, double temperatureDecreaseRatio)
+        {
+            if (iterationsCount < 1)
+                throw new ArgumentException("Must be at least 1", nameof(iterationsCount));
+            if (temperatureDecreaseRatio <= 0)
+                throw new ArgumentException("Must be greater than 0", nameof(temperatureDecreaseRatio));
+
+            _iterationsCount = iterationsCount;
+            _temperatureDecreaseRatio = temperatureDecreaseRatio;
+        }
 
         public TSPResult Optimization(Point[] points, double startTemperature, double endTemperature)
         {
@@ -22,7 +38,7 @@ namespace Cnsl.Algorithms.SimulatedAnnealing
             
             var temperature = startTemperature;
 
-            for (int i = 1; i < DefaultIterationsCount; i++)
+            for (int i = 1; i < _iterationsCount; i++)
             {
                 GenerateStateCandidate(result.State);
 
@@ -71,6 +87,6 @@ namespace Cnsl.Algorithms.SimulatedAnnealing
             => probability > 1 || probability < 0 ? false : _random.NextDouble() <= probability;
 
         private double DecreaseTemperature(double temperature, int i)
-            => i > 0 ? temperature * TemperatureDecreaseRatio / i : temperature;
+            => i > 0 ? temperature * _temperatureDecreaseRatio / i : temperature;
     }
 }
