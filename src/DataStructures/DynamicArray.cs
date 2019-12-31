@@ -25,7 +25,7 @@ namespace Cnsl.DataStructures
 
         public int IndexOf(T value)
         {
-            for (int i = 0; i < _array.Length; i++)
+            for (int i = 0; i < _itemsCount; i++)
             {
                 if (_array[i].Equals(value))
                     return i;
@@ -99,7 +99,7 @@ namespace Cnsl.DataStructures
 
         public bool Remove(T value)
         {
-            for (int i = 0; i < _array.Length; i++)
+            for (int i = 0; i < _itemsCount; i++)
             {
                 if (_array[i].Equals(value))
                 {
