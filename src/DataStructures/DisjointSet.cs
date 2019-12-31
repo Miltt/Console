@@ -30,7 +30,7 @@ namespace Cnsl.DataStructures
         }
 
         public int Find(int item)
-            => item > 0 && item < _set.Length
+            => item >= 0 && item < _set.Length
                 ? Find(_set[item]).Value
                 : Unknown;
 
