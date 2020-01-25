@@ -29,6 +29,7 @@ Prerequisites:
     * Simplex Algorithm
   * Miscellaneous
     * Lucky Tickets
+    * Tower of Hanoi
   * Multithreading
     * Dining Philosophers Problem
     * Readers Writers Problem
