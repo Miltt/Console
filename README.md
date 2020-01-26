@@ -30,6 +30,7 @@ Prerequisites:
   * Miscellaneous
     * Lucky Tickets
     * Tower of Hanoi
+    * Eight queens puzzle
   * Multithreading
     * Dining Philosophers Problem
     * Readers Writers Problem
