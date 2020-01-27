@@ -31,6 +31,7 @@ Prerequisites:
     * Lucky Tickets
     * Tower of Hanoi
     * Eight queens puzzle
+    * Coin change problem
   * Multithreading
     * Dining Philosophers Problem
     * Readers Writers Problem
