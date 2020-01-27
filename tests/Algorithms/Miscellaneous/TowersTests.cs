@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Tests.Algorithms.Miscellaneous
 {
     [TestClass]
-    public class TowersTest
+    public class TowersTests
     {
         [TestMethod]
         public void MovesTest()
