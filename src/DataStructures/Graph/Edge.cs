@@ -38,7 +38,7 @@ namespace Cnsl.DataStructures
 
         public override bool Equals(object obj)
         {
-            return Equals(obj is IEdge);
+            return Equals(obj as IEdge);
         }
 
         public bool Equals(IEdge other)
