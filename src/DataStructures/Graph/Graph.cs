@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Cnsl.DataStructures
 {
-    public class Graph
+    public class Graph : IGraph
     {
         private IVertex[] _vertices;
 

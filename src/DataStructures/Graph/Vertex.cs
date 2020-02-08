@@ -26,6 +26,15 @@ namespace Cnsl.DataStructures
             _edges.Add(edge);
         }
 
+        public bool TryGetEdge(IVertex vertex, out IEdge edge)
+        {
+            edge = vertex != null 
+                ? _edges.Find(e => e.U == vertex) 
+                : (IEdge)null;
+            
+            return edge != null;
+        }
+
         public override string ToString()
         {
             return Num.ToString();

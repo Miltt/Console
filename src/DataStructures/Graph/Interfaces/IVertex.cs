@@ -8,5 +8,6 @@ namespace Cnsl.DataStructures
         IReadOnlyCollection<IEdge> Edges { get; }
         int Num { get; }
         void AddEdge(IEdge edge);
+        bool TryGetEdge(IVertex vertex, out IEdge edge);
     }
 }
