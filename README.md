@@ -86,6 +86,6 @@ Prerequisites:
   * Immutable Stack
 
 ## License
-Copyright (c) 2019 Ilya Moshanov
+Copyright (c) 2020 Ilya Moshanov
 
 Licensed under the [MIT License](./LICENSE).
