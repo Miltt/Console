@@ -1,5 +1,5 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/Miltt/Console)](https://github.com/Miltt/Console/releases/tag/v1.0)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Miltt/Console/.NETCore)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Miltt/Console/.NETCore)](https://github.com/Miltt/Console/actions)
 [![license](https://img.shields.io/github/license/Miltt/Console)](https://github.com/Miltt/Console/blob/master/LICENSE)
 
 # Console
