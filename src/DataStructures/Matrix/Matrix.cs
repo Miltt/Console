@@ -95,7 +95,7 @@ namespace Cnsl.DataStructures
                     array[j, i] = _array[i, j];
             }
 
-            Reassign(array, ColumnsCount, RowsCount);
+            Assign(array, ColumnsCount, RowsCount);
         }
 
         public void Multiplication(IMatrix matrix)
@@ -118,7 +118,7 @@ namespace Cnsl.DataStructures
                 }
             }
 
-            Reassign(array, RowsCount, matrix.ColumnsCount);
+            Assign(array, RowsCount, matrix.ColumnsCount);
         }
 
         public int this[int i, int j]
@@ -189,11 +189,12 @@ namespace Cnsl.DataStructures
                 throw new IndexOutOfRangeException("Index 'j' outside the range of the matrix");
         }
 
-        private void Reassign(int[,] matrix, int countRows, int countColumns)
+        private void Assign(int[,] array, int rowsCount, int columnsCount)
         {
-            RowsCount = countRows;
-            ColumnsCount = countColumns;
-            _array = matrix;
+            RowsCount = rowsCount;
+            ColumnsCount = columnsCount;
+            
+            _array = array;
         }
     }
 }
