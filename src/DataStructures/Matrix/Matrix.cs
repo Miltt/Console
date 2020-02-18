@@ -2,7 +2,7 @@ using System;
 
 namespace Cnsl.DataStructures
 {
-    public class Matrix : IEquatable<Matrix>
+    public class Matrix : IMatrix, IEquatable<IMatrix>
     {
         private readonly int[,] _matrix;
 
@@ -86,7 +86,7 @@ namespace Cnsl.DataStructures
             return Equals(obj as Matrix);
         }
 
-        public bool Equals(Matrix other)
+        public bool Equals(IMatrix other)
         {
             if (Object.ReferenceEquals(other, null))
                 return false;
