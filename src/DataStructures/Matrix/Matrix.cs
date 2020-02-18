@@ -4,10 +4,10 @@ namespace Cnsl.DataStructures
 {
     public class Matrix : IMatrix, IEquatable<IMatrix>
     {
-        private readonly int[,] _matrix;
+        private int[,] _array;
 
-        public int RowsCount { get; }
-        public int ColumnsCount { get; }
+        public int RowsCount { get; private set; }
+        public int ColumnsCount { get; private set; }
 
         public Matrix(int rowsCount, int columnsCount)
         {
@@ -19,7 +19,7 @@ namespace Cnsl.DataStructures
             RowsCount = rowsCount;
             ColumnsCount = columnsCount;
 
-            _matrix = new int[RowsCount, ColumnsCount];
+            _array = new int[RowsCount, ColumnsCount];
         }
 
         public Matrix(int[,] array)
@@ -30,12 +30,12 @@ namespace Cnsl.DataStructures
             RowsCount = array.GetLength(0);
             ColumnsCount = array.GetLength(1);
 
-            _matrix = new int[RowsCount, ColumnsCount];
+            _array = new int[RowsCount, ColumnsCount];
 
             for (int i = 0; i < RowsCount; i++)
             {
                 for (int j = 0; j < ColumnsCount; j++)
-                    _matrix[i, j] = array[i, j];
+                    _array[i, j] = array[i, j];
             }
         }
 
@@ -52,7 +52,7 @@ namespace Cnsl.DataStructures
             RowsCount = graph.Count;
             ColumnsCount = graph.Count;
 
-            _matrix = new int[RowsCount, ColumnsCount];
+            _array = new int[RowsCount, ColumnsCount];
 
             for (int i = 0; i < RowsCount; i++)
             {
@@ -61,9 +61,64 @@ namespace Cnsl.DataStructures
                 {
                     var u = graph[j];
                     if (v.TryGetEdge(u, out var edge))
-                        _matrix[i, j] = edge.Weight;
+                        _array[i, j] = edge.Weight;
                 }
             }
+        }
+
+        public void Addition(IMatrix matrix)
+        {
+            if (matrix is null)            
+                throw new ArgumentNullException(nameof(matrix));
+            if (RowsCount != matrix.RowsCount)
+                throw new ArgumentException("The number of rows of two matrices does not match");
+            if (ColumnsCount != matrix.ColumnsCount)
+                throw new ArgumentException("The number of columns of two matrices does not match");
+
+            for (int i = 0; i < RowsCount; i++)
+            {
+                for (int j = 0; j < ColumnsCount; j++)
+                {
+                    var value = _array[i, j] + matrix[i, j];
+                    _array[i, j] = value;
+                }
+            }
+        }
+
+        public void Transposition()
+        {
+            var array = new int[ColumnsCount, RowsCount];
+            
+            for (int i = 0; i < RowsCount; i++)
+            {
+                for (int j = 0; j < ColumnsCount; j++)
+                    array[j, i] = _array[i, j];
+            }
+
+            Reassign(array, ColumnsCount, RowsCount);
+        }
+
+        public void Multiplication(IMatrix matrix)
+        {
+            if (matrix is null)            
+                throw new ArgumentNullException(nameof(matrix));
+            if (ColumnsCount != matrix.RowsCount)
+                throw new ArgumentException("The number of columns must be equal to the number of rows");
+
+            var array = new int[RowsCount, matrix.ColumnsCount];
+            for (int i = 0; i < RowsCount; i++)
+            {
+                for (int j = 0; j < matrix.ColumnsCount; j++)
+                {
+                    for (int k = 0; k < ColumnsCount; k++)
+                    {
+                        var value = _array[i, k] * matrix[k, j];
+                        array[i, j] += value;
+                    }
+                }
+            }
+
+            Reassign(array, RowsCount, matrix.ColumnsCount);
         }
 
         public int this[int i, int j]
@@ -71,13 +126,13 @@ namespace Cnsl.DataStructures
             get
             {
                 ThrowIfIndexOutOfRange(i, j);
-                return _matrix[i, j];
+                return _array[i, j];
             }
             
             set
             {
                 ThrowIfIndexOutOfRange(i, j);
-                _matrix[i, j] = value;
+                _array[i, j] = value;
             }
         }
 
@@ -101,7 +156,7 @@ namespace Cnsl.DataStructures
             {
                 for (int j = 0; j < ColumnsCount; j++)
                 {
-                    if (_matrix[i, j] != other[i, j])                    
+                    if (_array[i, j] != other[i, j])                    
                         return false;
                 }
             }
@@ -114,7 +169,7 @@ namespace Cnsl.DataStructures
             unchecked
             {
                 var hashCode = 0;
-                hashCode = (hashCode * 37) ^ _matrix.GetHashCode();
+                hashCode = (hashCode * 37) ^ _array.GetHashCode();
                 hashCode = (hashCode * 37) ^ RowsCount.GetHashCode();
                 hashCode = (hashCode * 37) ^ ColumnsCount.GetHashCode();
                 return hashCode;
@@ -132,6 +187,13 @@ namespace Cnsl.DataStructures
                 throw new IndexOutOfRangeException("Index 'i' outside the range of the matrix");
             if (j < 0 || j >= ColumnsCount)
                 throw new IndexOutOfRangeException("Index 'j' outside the range of the matrix");
+        }
+
+        private void Reassign(int[,] matrix, int countRows, int countColumns)
+        {
+            RowsCount = countRows;
+            ColumnsCount = countColumns;
+            _array = matrix;
         }
     }
 }

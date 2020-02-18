@@ -143,5 +143,83 @@ namespace Tests.DataStructures
 
             Assert.IsTrue(matrix.Equals(expectedMatrix), "The adjacency matrix was created incorrectly");
         }
+
+        [TestMethod]
+        public void MatrixAdditionTest()
+        {
+            var matrixA = new Matrix(new[,] 
+            {
+                { 1, 3 },
+                { 1, 0 },
+                { 1, 2 }
+            });
+
+            var matrixB = new Matrix(new[,] 
+            {
+                { 0, 0 },
+                { 7, 5 },
+                { 2, 1 }
+            });
+
+            var expectedMatrix = new Matrix(new[,] 
+            {
+                { 1, 3 },
+                { 8, 5 },
+                { 3, 3 }
+            });
+
+            matrixA.Addition(matrixB);
+
+            Assert.IsTrue(matrixA.Equals(expectedMatrix), "Matrix addition is incorrect");
+        }
+
+        [TestMethod]
+        public void MatrixTranspositionTest()
+        {
+            var matrix = new Matrix(new[,] 
+            {
+                { 1, 2 },
+                { 3, 4 },
+                { 5, 6 }
+            });
+            
+            matrix.Transposition();
+
+            var expectedMatrix = new Matrix(new[,] 
+            {
+                { 1, 3, 5 },
+                { 2, 4, 6 },
+            });
+
+            Assert.IsTrue(matrix.Equals(expectedMatrix), "Matrix transposition is incorrect");
+        }
+
+        [TestMethod]
+        public void MatrixMultiplicationTest()
+        {
+            var matrixA = new Matrix(new[,] 
+            {
+                { 2, 1 },
+                { -3, 0 },
+                { 4, -1 }
+            });
+
+            var matrixB = new Matrix(new[,] 
+            {
+                { 5, -1, 6 },
+                { -3, 0, 7 }
+            });
+
+            var expectedMatrix = new Matrix(new[,] 
+            {
+                { 7, -2 , 19 },
+                { -15, 3, -18 },
+                { 23, -4, 17 }
+            });
+
+            matrixA.Multiplication(matrixB);
+
+            Assert.IsTrue(matrixA.Equals(expectedMatrix), "Matrix multiplication incorrect");
+        }
     }
 }
