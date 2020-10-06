@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Cnsl.Common.Collections
+namespace Cnsl.DataStructures
 {
     public sealed class ImmutableStack<T> : IImmutableStack<T>, IEnumerable<T>
     {

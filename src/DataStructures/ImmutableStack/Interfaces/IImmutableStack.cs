@@ -1,4 +1,4 @@
-namespace Cnsl.Common.Collections
+namespace Cnsl.DataStructures
 {
     public interface IImmutableStack<T>
     {
