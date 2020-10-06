@@ -15,7 +15,7 @@ namespace Tests.DataStructures
             var tree = new AvlTree();
             tree.Add(rootKey);
 
-            Assert.IsTrue(tree.Root.Key == rootKey, "Added node with wrong key");
+            Assert.IsTrue(tree.Root == rootKey, "Added node with wrong key");
         }
 
         [TestMethod]
@@ -29,9 +29,7 @@ namespace Tests.DataStructures
             tree.Add(removeKey);
             tree.Remove(removeKey);
 
-            const int expectedHeight = 1;
-
-            Assert.IsTrue(tree.Root.Key == rootKey && tree.Root.Height == expectedHeight, "Deleted node with wrong key");
+            Assert.IsTrue(tree.Root == rootKey, "Deleted node with wrong key");
         }
 
         [TestMethod]
@@ -43,7 +41,7 @@ namespace Tests.DataStructures
             tree.Add(5);
             tree.Add(7);
 
-            var result = tree.Root.InOrderTravers();
+            var result = tree.InOrderTravers();
             var expectedResult = new[] { 3, 4, 5, 7 };
 
             Assert.IsTrue(result.SequenceEqual(expectedResult), "The tree traver is wrong");
