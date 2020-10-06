@@ -84,6 +84,7 @@ Prerequisites:
   * Dynamic Array
   * Hash Table
   * Immutable Stack
+  * Lock-Free Stack
 
 ## License
 Copyright (c) 2020 Ilya Moshanov
