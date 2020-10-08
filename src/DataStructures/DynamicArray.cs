@@ -1,16 +1,21 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Cnsl.DataStructures
 {
-    public class DynamicArray<T>
+    public class DynamicArray<T> : IReadOnlyCollection<T>
         where T : IEquatable<T>
     {
+        public static readonly DynamicArray<T> Empty = new DynamicArray<T>();
+
         private const int DefaultSize = 0;
 
         private T[] _array;
         private int _itemsCount;
 
-        public int Length => _array.Length;
+        public int Length => _itemsCount;
+        int IReadOnlyCollection<T>.Count => Length;
 
         public DynamicArray() 
             : this(DefaultSize) { }
@@ -39,7 +44,7 @@ namespace Cnsl.DataStructures
             get
             {
                 ThrowIfInvalidIndex(index);
-                return _array[index];                
+                return _array[index];
             }
 
             set
@@ -123,6 +128,17 @@ namespace Cnsl.DataStructures
             var newArray = new T[newSize];
             _array.CopyTo(newArray, 0);
             _array = newArray;
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            for (int i = 0; i < _itemsCount; i++)
+                yield return _array[i];
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }
