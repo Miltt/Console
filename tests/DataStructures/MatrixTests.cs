@@ -24,17 +24,17 @@ namespace Tests.DataStructures
             const int rowsCount = 2;
             const int columnsCount = 3;
 
-            var array = new int [rowsCount, columnsCount]
+            var array = new int[rowsCount, columnsCount]
             {
                 { 1, 2, 3 },
                 { 4, 5, 6 }
             };
 
             var matrix = new Matrix(array);
-            
+
             const int i = 0;
             const int j = 2;
-            
+
             var value = matrix[i, j];
             const int expectedValue = 3;
 
@@ -47,14 +47,14 @@ namespace Tests.DataStructures
             const int rowsCount = 2;
             const int columnsCount = 3;
 
-            var array = new int [rowsCount, columnsCount]
+            var array = new int[rowsCount, columnsCount]
             {
                 { 1, 2, 3 },
                 { 4, 5, 6 }
             };
 
             var matrix = new Matrix(array);
-            
+
             var isValid = matrix.RowsCount == rowsCount && matrix.ColumnsCount == columnsCount;
             if (isValid)
             {
@@ -83,7 +83,7 @@ namespace Tests.DataStructures
             const int rowsCount = 2;
             const int columnsCount = 3;
 
-            var array = new int [rowsCount, columnsCount]
+            var array = new int[rowsCount, columnsCount]
             {
                 { 1, 2, 3 },
                 { 4, 5, 6 }
@@ -101,7 +101,7 @@ namespace Tests.DataStructures
             const int rowsCount = 2;
             const int columnsCount = 3;
 
-            var array = new int [rowsCount, columnsCount]
+            var array = new int[rowsCount, columnsCount]
             {
                 { 1, 2, 3 },
                 { 4, 5, 6 }
@@ -131,7 +131,7 @@ namespace Tests.DataStructures
             graph.AddEdge(numV: 3, numU: 5, weight: 1);
 
             var matrix = new Matrix(graph);
-            var expectedMatrix = new Matrix(new int[,] 
+            var expectedMatrix = new Matrix(new int[,]
             {
                 { 0, 1, 0, 0, 1, 0 },
                 { 1, 0, 1, 0, 1, 0 },
@@ -147,21 +147,21 @@ namespace Tests.DataStructures
         [TestMethod]
         public void MatrixAdditionTest()
         {
-            var matrixA = new Matrix(new[,] 
+            var matrixA = new Matrix(new[,]
             {
                 { 1, 3 },
                 { 1, 0 },
                 { 1, 2 }
             });
 
-            var matrixB = new Matrix(new[,] 
+            var matrixB = new Matrix(new[,]
             {
                 { 0, 0 },
                 { 7, 5 },
                 { 2, 1 }
             });
 
-            var expectedMatrix = new Matrix(new[,] 
+            var expectedMatrix = new Matrix(new[,]
             {
                 { 1, 3 },
                 { 8, 5 },
@@ -176,16 +176,16 @@ namespace Tests.DataStructures
         [TestMethod]
         public void MatrixTranspositionTest()
         {
-            var matrix = new Matrix(new[,] 
+            var matrix = new Matrix(new[,]
             {
                 { 1, 2 },
                 { 3, 4 },
                 { 5, 6 }
             });
-            
+
             matrix.Transposition();
 
-            var expectedMatrix = new Matrix(new[,] 
+            var expectedMatrix = new Matrix(new[,]
             {
                 { 1, 3, 5 },
                 { 2, 4, 6 },
@@ -197,20 +197,20 @@ namespace Tests.DataStructures
         [TestMethod]
         public void MatrixMultiplicationTest()
         {
-            var matrixA = new Matrix(new[,] 
+            var matrixA = new Matrix(new[,]
             {
                 { 2, 1 },
                 { -3, 0 },
                 { 4, -1 }
             });
 
-            var matrixB = new Matrix(new[,] 
+            var matrixB = new Matrix(new[,]
             {
                 { 5, -1, 6 },
                 { -3, 0, 7 }
             });
 
-            var expectedMatrix = new Matrix(new[,] 
+            var expectedMatrix = new Matrix(new[,]
             {
                 { 7, -2 , 19 },
                 { -15, 3, -18 },

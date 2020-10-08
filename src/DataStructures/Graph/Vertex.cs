@@ -5,9 +5,9 @@ namespace Cnsl.DataStructures
 {
     public class Vertex : IVertex
     {
-        private List<IEdge> _edges = new List<IEdge>();
+        private DynamicArray<IEdge> _edges;
 
-        public IReadOnlyCollection<IEdge> Edges => _edges;
+        public IReadOnlyCollection<IEdge> Edges => _edges ?? DynamicArray<IEdge>.Empty;
         public int Num { get; }
 
         public Vertex(int num)
@@ -22,6 +22,8 @@ namespace Cnsl.DataStructures
         {
             if (edge is null)
                 throw new ArgumentNullException(nameof(edge));
+            if (_edges is null)
+                _edges = new DynamicArray<IEdge>(size: 1);
             
             _edges.Add(edge);
         }
@@ -29,9 +31,9 @@ namespace Cnsl.DataStructures
         public bool TryGetEdge(IVertex vertex, out IEdge edge)
         {
             edge = vertex != null 
-                ? _edges.Find(e => e.U == vertex) 
+                ? FindInternal(vertex)
                 : (IEdge)null;
-            
+
             return edge != null;
         }
 
@@ -77,6 +79,21 @@ namespace Cnsl.DataStructures
         public static bool operator !=(Vertex left, Vertex right)
         {
             return !(left == right);
+        }
+
+        private IEdge FindInternal(IVertex vertex)
+        {
+            if (_edges != null)
+            {
+                for (int i = 0; i < _edges.Length; i++)
+                {
+                    var edge = _edges[i];
+                    if (edge.U == vertex)
+                        return edge;
+                }
+            }
+
+            return null;
         }
     }
 }
