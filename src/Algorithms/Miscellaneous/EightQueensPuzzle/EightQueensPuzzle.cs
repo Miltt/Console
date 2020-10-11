@@ -2,14 +2,13 @@ namespace Cnsl.Algorithms.Miscellaneous
 {
     public class EightQueensPuzzle
     {
-        public static Сhessboard Run(int boardSize)
+        public static bool TryFind(int boardSize, out Сhessboard board)
         {
-            var board = new Сhessboard(boardSize);
-            TryFind(in board, 0);
-            return board;
+            board = new Сhessboard(boardSize);
+            return TryFindInternal(in board, 0);
         }
 
-        private static bool TryFind(in Сhessboard board, int i)
+        private static bool TryFindInternal(in Сhessboard board, int i)
         {
             for (int j = 0; j < board.Size; j++)
             {
@@ -17,7 +16,7 @@ namespace Cnsl.Algorithms.Miscellaneous
                 {
                     board[i, j] = true;
                     
-                    if (i == board.Size - 1 || TryFind(in board, i + 1))
+                    if (i == board.Size - 1 || TryFindInternal(in board, i + 1))
                         return true;
 
                     board[i, j] = false;
