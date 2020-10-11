@@ -10,7 +10,7 @@ namespace Tests.Algorithms.Miscellaneous
         public void SolutionTest()
         {
             const int boardSize = 8;
-            var result = EightQueensPuzzle.Run(boardSize);
+            EightQueensPuzzle.TryFind(boardSize, out var result);
 
             var solution1 = new bool[boardSize, boardSize];
             solution1[0, 0] = true;
