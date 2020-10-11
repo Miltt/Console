@@ -1,12 +1,36 @@
 using System;
+using System.Collections.Generic;
 
 namespace Cnsl.Algorithms.LinearProgramming
 {
     public class SimplexAlgorithm
     {
+        public class Result
+        {
+            public double[,] Table { get; set; }
+            public bool[] BasicSolution { get; }
+
+            public Result(double[,] table, bool[] basicSolution)
+            {
+                Table = table ?? throw new ArgumentNullException(nameof(table));
+                BasicSolution = basicSolution ?? throw new ArgumentNullException(nameof(basicSolution));
+            }
+
+            public IEnumerable<double> GetSolution()
+            {
+                var j = Table.GetUpperBound(1);
+
+                for (int i = 0; i < BasicSolution.Length; i++)
+                {
+                    if (BasicSolution[i])
+                        yield return Table[i, j];
+                }
+            } 
+        }
+
         private struct Pivot
         {
-            public double Value { get; set; }
+            public double Value { get; internal set; }
             public int Row { get; set; }
             public int Column { get; set; }
 
@@ -21,7 +45,7 @@ namespace Cnsl.Algorithms.LinearProgramming
         private const int RowDimension = 0;
         private const int ColumnDimensions = 1;
 
-        public SimplexAlgorithmResult Maximize(double[] funcCoefficients, double[,] bounds)
+        public Result Maximize(double[] funcCoefficients, double[,] bounds)
         {
             if (funcCoefficients is null)
                 throw new ArgumentNullException(nameof(funcCoefficients));
@@ -55,7 +79,7 @@ namespace Cnsl.Algorithms.LinearProgramming
             return result;
         }
 
-        private SimplexAlgorithmResult Init(double[] funcCoefficients, double[,] bounds)
+        private Result Init(double[] funcCoefficients, double[,] bounds)
         {
             var table = new double[bounds.GetLength(RowDimension) + 1, funcCoefficients.Length + 1];
 
@@ -68,7 +92,7 @@ namespace Cnsl.Algorithms.LinearProgramming
             for (int i = 0; i < funcCoefficients.Length; i++)
                 table[table.GetUpperBound(RowDimension), i] = funcCoefficients[i] * -1;
 
-            return new SimplexAlgorithmResult(table, new bool[bounds.GetLength(RowDimension) + 1]);
+            return new Result(table, new bool[bounds.GetLength(RowDimension) + 1]);
         }
 
         private bool IsOptimalSolution(double[] funcCoefficients, double[,] table)
@@ -82,7 +106,7 @@ namespace Cnsl.Algorithms.LinearProgramming
             return true;
         }
 
-        private Pivot GetPivot(double[] funcCoefficients, SimplexAlgorithmResult result)
+        private Pivot GetPivot(double[] funcCoefficients, Result result)
         {
             var pivot = new Pivot();
 
