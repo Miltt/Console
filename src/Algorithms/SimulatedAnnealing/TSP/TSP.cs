@@ -5,6 +5,48 @@ namespace Cnsl.Algorithms.SimulatedAnnealing
 {
     public class TSP
     {
+        public readonly struct Point
+        {
+            public int X { get; }
+            public int Y { get; }
+            
+            public Point(int x, int y)
+            {
+                X = x;
+                Y = y;
+            }
+
+            public double GetEuclideanDistance(in Point to)
+                => Math.Sqrt(Math.Pow(this.X - to.X, 2) + Math.Pow(this.Y - to.Y, 2));
+        }
+
+        public class Result
+        {
+            public int[] State { get; internal set; }
+            public double Energy { get; internal set; }
+
+            public Result(int length)
+            {
+                if (length < 1)
+                    throw new ArgumentException("Must be at least 1", nameof(length));
+
+                State = InitState(length);
+            }
+
+            private int[] InitState(int length)
+            {
+                var array = new int[length];
+                for (int i = 0; i < array.Length; i++)
+                    array[i] = i;
+                
+                var random = new Random();
+                for (int i = 0; i < array.Length; i++)
+                    array.Swap(i, random.Next(array.Length));
+
+                return array;
+            }
+        }
+
         private const int DefaultIterationsCount = 10000;
         private const double DefaultTemperatureDecreaseRatio = 0.1;
         
@@ -26,14 +68,14 @@ namespace Cnsl.Algorithms.SimulatedAnnealing
             _temperatureDecreaseRatio = temperatureDecreaseRatio;
         }
 
-        public TSPResult Optimization(Point[] points, double startTemperature, double endTemperature)
+        public Result Optimization(Point[] points, double startTemperature, double endTemperature)
         {
             if (points == null || points.Length == 0)
                 throw new ArgumentException("Must contain at least one element", nameof(points));
             if (startTemperature < endTemperature)
                 throw new ArgumentException("Must be less then end startTemperature", nameof(endTemperature));
 
-            var result = new TSPResult(points.Length);            
+            var result = new Result(points.Length);
             result.Energy = CalculateEnergy(result.State, points);
             
             var temperature = startTemperature;
@@ -63,7 +105,7 @@ namespace Cnsl.Algorithms.SimulatedAnnealing
         private double CalculateEnergy(int[] state, Point[] points)
         {
             var energy = 0.0;
-            for (int i = 0; i < state.Length - 1; i++)            
+            for (int i = 0; i < state.Length - 1; i++)
                 energy += points[state[i]].GetEuclideanDistance(in points[state[i + 1]]);
 
             energy += points[state[state.Length - 1]].GetEuclideanDistance(in points[state[0]]); // close the route
