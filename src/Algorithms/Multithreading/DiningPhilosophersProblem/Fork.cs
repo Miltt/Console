@@ -33,5 +33,10 @@ namespace Cnsl.Algorithms.Multithreading
                 Monitor.Pulse(_sync);
             }
         }
+
+        public override string ToString()
+        {
+            return $"Num:{Num}";
+        }
     }
 }
