@@ -23,8 +23,8 @@ namespace Tests.Algorithms.Searching
             var vertex = graph[0];
             var result = DFS.Search(graph, vertex);
             
-            var expectedTrack = new List<int> { 0, 1, 3, 2, 4 };            
-            var isEqual = result.Track.Select(v => v.Num).SequenceEqual(expectedTrack);
+            var expectedTrack = new List<int> { 0, 1, 3, 2, 4 };
+            var isEqual = result.GetTrack().Select(v => v.Num).SequenceEqual(expectedTrack);
             
             Assert.IsTrue(isEqual, "Two sequences are not equal by comparing the element");
         }
