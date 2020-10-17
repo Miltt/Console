@@ -1,3 +1,4 @@
+using System.Linq;
 using Cnsl.Algorithms.Searching;
 using Cnsl.DataStructures;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -18,17 +19,16 @@ namespace Tests.Algorithms.Searching
             var vertex4 = graph[4];
             var vertex5 = graph[5];
 
-            var result = Dijkstra.Search(graph, vertex0);
+            var distances = Dijkstra.Search(graph, vertex0).ToList();
 
-            var isValidDistanse =
-                result.GetDistance(vertex0) == 0 &&
-                result.GetDistance(vertex1) == 7 &&
-                result.GetDistance(vertex2) == 9 &&
-                result.GetDistance(vertex3) == 20 &&
-                result.GetDistance(vertex4) == 20 &&
-                result.GetDistance(vertex5) == 11;
+            var isValid = distances.Find(d => d.Vertex.Equals(vertex0)).Value == 0;
+            isValid &= distances.Find(d => d.Vertex.Equals(vertex1)).Value == 7;
+            isValid &= distances.Find(d => d.Vertex.Equals(vertex2)).Value == 9;
+            isValid &= distances.Find(d => d.Vertex.Equals(vertex3)).Value == 20;
+            isValid &= distances.Find(d => d.Vertex.Equals(vertex4)).Value == 20;
+            isValid &= distances.Find(d => d.Vertex.Equals(vertex5)).Value == 11;
 
-            Assert.IsTrue(isValidDistanse, "Distance not found correctly");
+            Assert.IsTrue(isValid, "Distance not found correctly");
         }
 
         private static Graph GetGraph()

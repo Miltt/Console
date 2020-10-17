@@ -9,6 +9,8 @@ namespace Cnsl.Algorithms.Searching
         {
             if (graph is null)
                 throw new ArgumentNullException(nameof(graph));
+            if (vertex is null)
+                throw new ArgumentNullException(nameof(vertex));
 
             var result = new GraphSearchResult(graph.Count);
             SearchInternal(graph, vertex, result);
@@ -26,4 +28,4 @@ namespace Cnsl.Algorithms.Searching
             }
         }
     }
-} 
+}

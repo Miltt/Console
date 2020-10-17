@@ -19,7 +19,7 @@ namespace Tests.Algorithms.Searching
             var result = BFS.Search(graph, source, target);
 
             var expectedTrack = new List<int> { 0, 1, 2, 3, 4 };
-            var isEqual = result.Track.Select(v => v.Num).SequenceEqual(expectedTrack);
+            var isEqual = result.GetTrack().Select(v => v.Num).SequenceEqual(expectedTrack);
 
             Assert.IsTrue(isEqual, "Two sequences are not equal by comparing the element");
         }

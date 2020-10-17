@@ -66,33 +66,33 @@ namespace Cnsl.Algorithms.Multithreading
         private void Think()
         {
             AddEvent(EventType.Think, "Think...");
-            Thread.Sleep(_thinkDurationMs);            
+            Thread.Sleep(_thinkDurationMs);
         }
 
         private void Eat()
         {
             AddEvent(EventType.Eat, "Eat...");
-            Thread.Sleep(_eatDurationMs);            
+            Thread.Sleep(_eatDurationMs);
         }
 
         private void TakeForks()
         {
-            AddEvent(EventType.TakeLeftFork, $"Num:{_left.Num}");
+            AddEvent(EventType.TakeLeftFork, _left.ToString());
             _left.Take();
-            AddEvent(EventType.TakeRightFork, $"Num:{_right.Num}");
+            AddEvent(EventType.TakeRightFork, _right.ToString());
             _right.Take();
         }
 
         private void ReleaseForks()
         {
-            AddEvent(EventType.ReleaseLeftFork, $"Num:{_left.Num}");
+            AddEvent(EventType.ReleaseLeftFork, _left.ToString());
             _left.Release();
-            AddEvent(EventType.ReleaseRightFork, $"Num:{_right.Num}");
+            AddEvent(EventType.ReleaseRightFork, _right.ToString());
             _right.Release();
         }
 
         private void AddEvent(EventType type, string message)
-        {            
+        {
             EventRaised?.Invoke(this, new PhilosopherEventArgs(Name, type, message));
         }
 

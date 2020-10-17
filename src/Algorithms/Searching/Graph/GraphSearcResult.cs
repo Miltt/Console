@@ -9,17 +9,23 @@ namespace Cnsl.Algorithms.Searching
     {
         private readonly struct Visit
         {
-            public const int UnknownDistance = -1;
-
+            public IVertex Vertex { get; }
             public bool IsVisited { get; }
+            public int VisitNum { get; }
             public int Distance { get; }
 
-            public Visit(int distance)
+            public Visit(IVertex vertex, int visitNum, int distance)
             {
+                if (vertex is null)
+                    throw new ArgumentNullException(nameof(vertex));
+                if (visitNum < 0)
+                    throw new ArgumentException("Must be at least 0", nameof(visitNum));
                 if (distance < 0)
                     throw new ArgumentException("Must be at least 0", nameof(distance));
 
+                Vertex = vertex;
                 IsVisited = true;
+                VisitNum = visitNum;
                 Distance = distance;
             }
 
@@ -30,8 +36,8 @@ namespace Cnsl.Algorithms.Searching
         }
 
         private readonly Visit[] _visits;
-        private readonly List<IVertex> _track;
-        public IReadOnlyCollection<IVertex> Track => _track;
+        private Visit _lastVisit;
+        private int _visitNum;
 
         public GraphSearchResult(int verticesCount)
         {
@@ -39,19 +45,19 @@ namespace Cnsl.Algorithms.Searching
                 throw new ArgumentException("Must be at least 0", nameof(verticesCount));
 
             _visits = new Visit[verticesCount];
-            _track = new List<IVertex>();
         }
 
-        public void MarkAsVisited(IVertex vertex)
+        internal void MarkAsVisited(IVertex vertex)
         {
             ThrowIfVertexIsNull(vertex);
 
-            _visits[vertex.Num] = new Visit(CalcDistance());
-            _track.Add(vertex);
+            var visit = new Visit(vertex, _visitNum++, CalcDistance());
+            _visits[vertex.Num] = visit;
+            _lastVisit = visit;
         }
 
-        public bool IsVisited(IVertex vertex)
-        {       
+        internal bool IsVisited(IVertex vertex)
+        {
             ThrowIfVertexIsNull(vertex);
 
             return _visits[vertex.Num].IsVisited;
@@ -61,17 +67,21 @@ namespace Cnsl.Algorithms.Searching
         {
             ThrowIfVertexIsNull(vertex);
 
-            var v = _visits[vertex.Num];
-            return v.IsVisited
-                ? v.Distance
-                : Visit.UnknownDistance;
+            var visit = _visits[vertex.Num];
+            return visit.IsVisited
+                ? visit.Distance
+                : -1;
+        }
+
+        public IEnumerable<IVertex> GetTrack()
+        {
+            return _visits.OrderBy(v => v.VisitNum).Select(v => v.Vertex);
         }
 
         private int CalcDistance()
         {
-            var lastMarkedVertex = _track.LastOrDefault();
-            return lastMarkedVertex != null
-                ? _visits[lastMarkedVertex.Num].Distance + 1
+            return _lastVisit.Vertex != null
+                ? _visits[_lastVisit.Vertex.Num].Distance + 1
                 : 0;
         }
 
