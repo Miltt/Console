@@ -39,5 +39,5 @@ namespace Cnsl.Algorithms.Searching
 
             return result;
         }
-    }    
+    }
 } 

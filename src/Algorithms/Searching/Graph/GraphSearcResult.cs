@@ -56,8 +56,8 @@ namespace Cnsl.Algorithms.Searching
             _lastVisit = visit;
         }
 
-        public bool IsVisited(IVertex vertex)
-        {       
+        internal bool IsVisited(IVertex vertex)
+        {
             ThrowIfVertexIsNull(vertex);
 
             return _visits[vertex.Num].IsVisited;
