@@ -23,7 +23,7 @@ namespace Cnsl.Algorithms.Searching
             }
         }
 
-        private readonly struct Result
+        private readonly ref struct Result
         {
             private readonly Distance[] _distance;
 
@@ -60,14 +60,13 @@ namespace Cnsl.Algorithms.Searching
                 _distance[vertex.Num] = new Distance(vertex, distance);
             }
 
-            public IEnumerable<Distance> GetDistances()
+            public IReadOnlyCollection<Distance> GetDistances()
             {
-                for (int i = 0; i < _distance.Length; i++)
-                    yield return _distance[i];
+                return Array.AsReadOnly(_distance);
             }
         }
 
-        public static IEnumerable<Distance> Search(Graph graph, IVertex source)
+        public static IReadOnlyCollection<Distance> Search(Graph graph, IVertex source)
         {
             if (graph is null)
                 throw new ArgumentNullException(nameof(graph));
@@ -78,7 +77,7 @@ namespace Cnsl.Algorithms.Searching
 
             while (graph.Count > 0)
             {
-                var vertex = FindVertexByMinDistance(graph.Vertices, result);
+                var vertex = FindVertexByMinDistance(graph.Vertices, in result);
                 graph.RemoveVertex(vertex);
 
                 foreach (var edge in vertex.Edges)
@@ -92,7 +91,7 @@ namespace Cnsl.Algorithms.Searching
             return result.GetDistances();
         }
 
-        private static IVertex FindVertexByMinDistance(IReadOnlyCollection<IVertex> vertices, Result result)
+        private static IVertex FindVertexByMinDistance(IReadOnlyCollection<IVertex> vertices, in Result result)
         {
             var vertex = (IVertex)default;
             var minDistance = Distance.Infinity.Value;
