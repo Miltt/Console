@@ -10,7 +10,7 @@ namespace Tests.Algorithms.Sorting
         [TestMethod]
         public void SortAscTest()
         {
-            var array = new int[] { 8, 2, 3, 5, 6, 1, 7, 4, 0, 9 };
+            var array = new int[] { 8, 2, 3, 5, 6, 2, 1, 7, 4, 0, -4, 9 };
 
             new Insertion().Sort(array);
 

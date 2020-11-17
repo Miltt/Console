@@ -4,7 +4,8 @@ namespace Cnsl.Algorithms.Sorting
 {
     public class Merge : ISort
     {
-        public void Sort(int[] array)
+        public void Sort<T>(T[] array)
+            where T : IComparable<T>
         {
             if (array is null)
                 throw new ArgumentNullException(nameof(array));
@@ -12,7 +13,8 @@ namespace Cnsl.Algorithms.Sorting
             SortInternal(array, 0, array.Length);
         }
 
-        private void SortInternal(int[] array, int start, int end)
+        private void SortInternal<T>(T[] array, int start, int end)
+            where T : IComparable<T>
         {
             if (end - start <= 1)
                 return;
@@ -21,19 +23,20 @@ namespace Cnsl.Algorithms.Sorting
             
             SortInternal(array, start, mid);
             SortInternal(array, mid, end);
-            MergeInternal(array, start, mid, end);            
+            MergeInternal(array, start, mid, end);
         }
 
-        private void MergeInternal(int[] array, int start, int mid, int end)
+        private void MergeInternal<T>(T[] array, int start, int mid, int end)
+            where T : IComparable<T>
         {
-            var result = new int[end - start];
+            var result = new T[end - start];
             var l = 0;
             var r = 0;
             var i = 0;
 
             while (l < mid - start && r < end - mid)
             {
-                result[i++] = array[start + l] < array[mid + r]
+                result[i++] = array[start + l].CompareTo(array[mid + r]) < 0
                     ? array[start + l++]
                     : array[mid + r++];
             }

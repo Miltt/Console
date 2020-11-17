@@ -5,7 +5,8 @@ namespace Cnsl.Algorithms.Sorting
 {
     public class Selection : ISort
     {
-        public void Sort(int[] array)
+        public void Sort<T>(T[] array)
+            where T : IComparable<T>
         {
             if (array is null)
                 throw new ArgumentNullException(nameof(array));
@@ -16,7 +17,7 @@ namespace Cnsl.Algorithms.Sorting
 
                 for (int j = i + 1; j < array.Length; j++)
                 {
-                    if (array[j] < array[min])
+                    if (array[j].CompareTo(array[min]) < 0)
                         min = j;
                 }
 

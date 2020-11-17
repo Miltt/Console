@@ -5,7 +5,8 @@ namespace Cnsl.Algorithms.Sorting
 {
     public class Gnome : ISort
     {
-        public void Sort(int[] array)
+        public void Sort<T>(T[] array)
+            where T : IComparable<T>
         {
             if (array is null)
                 throw new ArgumentNullException(nameof(array));
@@ -14,15 +15,15 @@ namespace Cnsl.Algorithms.Sorting
             
             while (i < array.Length)
             {
-                if (i == 0 || array[i - 1] <= array[i])
+                if (i == 0 || array[i - 1].CompareTo(array[i]) <= 0)
                 {
                     i++; 
                 }
                 else
                 {
                     array.Swap(i - 1, i);
-                    i--;                                          
-                }                
+                    i--;
+                }
             }
         }
     }
