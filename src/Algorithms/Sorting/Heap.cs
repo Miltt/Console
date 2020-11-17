@@ -5,7 +5,8 @@ namespace Cnsl.Algorithms.Sorting
 {
     public class Heap : ISort
     {
-        public void Sort(int[] array)
+        public void Sort<T>(T[] array)
+            where T : IComparable<T>
         {
             if (array is null)
                 throw new ArgumentNullException(nameof(array));
@@ -24,17 +25,18 @@ namespace Cnsl.Algorithms.Sorting
             }
         }
 
-        private void Shift(int[] array, int curIndex, int curLength)
+        private void Shift<T>(T[] array, int curIndex, int curLength)
+            where T : IComparable<T>
         {
             var maxChildIndex = 0;
 
             while (2 * curIndex + 1 < curLength)
             {
-                maxChildIndex = (2 * curIndex + 1 == curLength - 1) || (array[2 * curIndex + 1] > array[2 * curIndex + 2])
+                maxChildIndex = (2 * curIndex + 1 == curLength - 1) || (array[2 * curIndex + 1].CompareTo(array[2 * curIndex + 2]) > 0)
                     ? 2 * curIndex + 1
                     : 2 * curIndex + 2;
 
-                if (array[curIndex] >= array[maxChildIndex])
+                if (array[curIndex].CompareTo(array[maxChildIndex]) >= 0)
                     break;
                 
                 array.Swap(curIndex, maxChildIndex);

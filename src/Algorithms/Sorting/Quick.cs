@@ -5,7 +5,8 @@ namespace Cnsl.Algorithms.Sorting
 {
     public class Quick : ISort
     {
-        public void Sort(int[] array)
+        public void Sort<T>(T[] array)
+            where T : IComparable<T>
         {
             if (array is null)
                 throw new ArgumentNullException(nameof(array));
@@ -13,7 +14,8 @@ namespace Cnsl.Algorithms.Sorting
             SortInternal(array, 0, array.Length - 1);
         }
 
-        private void SortInternal(int[] array, int start, int end)
+        private void SortInternal<T>(T[] array, int start, int end)
+            where T : IComparable<T>
         {
             if (start < end)
             {
@@ -23,13 +25,14 @@ namespace Cnsl.Algorithms.Sorting
             }
         }
 
-        private int GetPivot(int[] array, int start, int end)
+        private int GetPivot<T>(T[] array, int start, int end)
+            where T : IComparable<T>
         {
             var pivot = start;
 
             for (int i = start; i <= end; i++)
             {
-                if (array[i] <= array[end])
+                if (array[i].CompareTo(array[end]) <= 0)
                     array.Swap(pivot++, i);
             }
 
