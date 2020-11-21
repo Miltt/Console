@@ -7,9 +7,9 @@ namespace Cnsl.Algorithms.Sorting
         public override void Sort<T>(T[] array)
         {
             SortInternal(array: array,
-                         start: 0,
-                         end: array.Length,
-                         isDescending: false);
+                start: 0,
+                end: array.Length,
+                isDescending: false);
         }
 
         public override void SortByDescending<T>(T[] array)

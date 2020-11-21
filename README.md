@@ -77,8 +77,12 @@ Prerequisites:
 * **Data Structures**
   * Graph
   * Heap
+    * Binary
+    * Binomial
   * Matrix
   * Tree
+    * AVL
+    * Red-black
   * Disjoint Set
   * Doubly Linked List
   * Dynamic Array
