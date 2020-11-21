@@ -6,5 +6,8 @@ namespace Cnsl.Algorithms.Sorting
     {
         void Sort<T>(T[] array) 
             where T : IComparable<T>;
+
+        void SortByDescending<T>(T[] array)
+            where T : IComparable<T>;
     }
 }

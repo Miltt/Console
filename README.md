@@ -64,7 +64,7 @@ Prerequisites:
       * Knuth-Morris-Pratt
   * Simulated Annealing
     * Travelling salesman problem
-  * Sorting
+  * Sorting (ascending and descending order)
     * Bubble
     * Cocktail
     * Gnome
