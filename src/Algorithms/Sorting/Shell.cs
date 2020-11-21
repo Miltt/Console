@@ -3,9 +3,19 @@ using Cnsl.Common.Extensions;
 
 namespace Cnsl.Algorithms.Sorting
 {
-    public class Shell : ISort
+    public class Shell : BaseSorter
     {
-        public void Sort<T>(T[] array)
+        public override void Sort<T>(T[] array)
+        {
+            SortInternal(array, isDescending: false);
+        }
+
+        public override void SortByDescending<T>(T[] array)
+        {
+            SortInternal(array, isDescending: true);
+        }
+
+        private void SortInternal<T>(T[] array, bool isDescending)
             where T : IComparable<T>
         {
             if (array is null)
@@ -17,7 +27,7 @@ namespace Cnsl.Algorithms.Sorting
                 for (int i = 0; i < array.Length - offset; i++)
                 {
                     var j = i;
-                    while (j >= 0 && array[j].CompareTo(array[j + offset]) > 0)
+                    while (j >= 0 && Compare(array[j], array[j + offset], isDescending) > 0)
                     {
                         array.Swap(j, j + offset);
                         j -= offset;

@@ -2,31 +2,41 @@ using System;
 
 namespace Cnsl.Algorithms.Sorting
 {
-    public class Merge : ISort
+    public class Merge : BaseSorter
     {
-        public void Sort<T>(T[] array)
+        public override void Sort<T>(T[] array)
+        {
+            SortInternal(array: array,
+                         start: 0,
+                         end: array.Length,
+                         isDescending: false);
+        }
+
+        public override void SortByDescending<T>(T[] array)
+        {
+            SortInternal(
+                array: array,
+                start: 0,
+                end: array.Length,
+                isDescending: true);
+        }
+
+        private void SortInternal<T>(T[] array, int start, int end, bool isDescending)
             where T : IComparable<T>
         {
             if (array is null)
                 throw new ArgumentNullException(nameof(array));
-
-            SortInternal(array, 0, array.Length);
-        }
-
-        private void SortInternal<T>(T[] array, int start, int end)
-            where T : IComparable<T>
-        {
             if (end - start <= 1)
                 return;
             
             var mid = start + (end - start) / 2;
             
-            SortInternal(array, start, mid);
-            SortInternal(array, mid, end);
-            MergeInternal(array, start, mid, end);
+            SortInternal(array, start, mid, isDescending);
+            SortInternal(array, mid, end, isDescending);
+            MergeInternal(array, start, mid, end, isDescending);
         }
 
-        private void MergeInternal<T>(T[] array, int start, int mid, int end)
+        private void MergeInternal<T>(T[] array, int start, int mid, int end, bool isDescending)
             where T : IComparable<T>
         {
             var result = new T[end - start];
@@ -36,7 +46,7 @@ namespace Cnsl.Algorithms.Sorting
 
             while (l < mid - start && r < end - mid)
             {
-                result[i++] = array[start + l].CompareTo(array[mid + r]) < 0
+                result[i++] = Compare(array[start + l], array[mid + r], isDescending) < 0
                     ? array[start + l++]
                     : array[mid + r++];
             }

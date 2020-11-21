@@ -3,9 +3,19 @@ using Cnsl.Common.Extensions;
 
 namespace Cnsl.Algorithms.Sorting
 {
-    public class Cocktail : ISort
+    public class Cocktail : BaseSorter
     {
-        public void Sort<T>(T[] array)
+        public override void Sort<T>(T[] array)
+        {
+            SortInternal(array, isDescending: false);
+        }
+
+        public override void SortByDescending<T>(T[] array)
+        {
+            SortInternal(array, isDescending: true);
+        }
+
+        private void SortInternal<T>(T[] array, bool isDescending)
             where T : IComparable<T>
         {
             if (array is null)
@@ -18,14 +28,14 @@ namespace Cnsl.Algorithms.Sorting
             {
                 for (int i = left; i < rigth; i++)
                 {
-                    if (array[i + 1].CompareTo(array[i]) < 0)
+                    if (Compare(array[i + 1], array[i], isDescending) < 0)
                         array.Swap(i + 1, i);
                 }
                 rigth--;
 
                 for (int i = rigth; i > left; i--)
                 {
-                    if (array[i - 1].CompareTo(array[i]) > 0)
+                    if (Compare(array[i - 1], array[i], isDescending) > 0)
                         array.Swap(i - 1, i);
                 }
                 left++;
