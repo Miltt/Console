@@ -16,32 +16,32 @@ Prerequisites:
 * Open the solution to build the application `dotnet build` and run tests `dotnet test`
   
 ## Implemented
-* **Algorithms**
-  * Cryptography
-    * RSA
-  * Dynamic Programming
-    * Knapsack Problem
-    * Fibonacci Number
-    * Longest common subsequence problem
-  * Greedy
-    * Prims
-  * Linear Programming
-    * Simplex Algorithm
-  * Miscellaneous
-    * Lucky Tickets
-    * Tower of Hanoi
-    * Eight queens puzzle
-    * Coin change problem
-  * Multithreading
-    * Dining Philosophers Problem
-    * Readers Writers Problem
-  * Number Theoretic
-    * Prime
-      * Primality Test
-      * Sieve of Atkin
-    * Exponentiation
-      * Modular exponentiation
-      * Exponentiation by squaring
+**Algorithms**
+* Cryptography
+  * RSA
+* Dynamic Programming
+  * Knapsack Problem
+  * Fibonacci Number
+  * Longest common subsequence problem
+* Greedy
+  * Prims
+* Linear Programming
+  * Simplex Algorithm
+* Miscellaneous
+  * Lucky Tickets
+   * Tower of Hanoi
+   * Eight queens puzzle
+   * Coin change problem
+* Multithreading
+  * Dining Philosophers Problem
+  * Readers Writers Problem
+* Number Theoretic
+  * Prime
+    * Primality Test
+    * Sieve of Atkin
+  * Exponentiation
+    * Modular exponentiation
+    * Exponentiation by squaring
     * Factorization
       * Trial division
       * Fermat's method
@@ -52,43 +52,50 @@ Prerequisites:
       * Recursive Naive
       * Peasant (Binary, Bitwise)
       * Karatsuba
-  * Searching
-    * Array
-      * Binary
-      * Linear
-    * Graph
-      * Breadth-first search
-      * Depth-first search
-      * Dijkstra
-    * String
-      * Knuth-Morris-Pratt
-  * Simulated Annealing
-    * Travelling salesman problem
-  * Sorting (ascending and descending order)
-    * Bubble
-    * Cocktail
-    * Gnome
-    * Heap
-    * Insertion
-    * Merge
-    * Quick
-    * Selection
-    * Shell
-* **Data Structures**
-  * Graph
-  * Heap
+* Searching
+  * Array
     * Binary
-    * Binomial
-  * Matrix
-  * Tree
-    * AVL
-    * Red-black
-  * Disjoint Set
-  * Doubly Linked List
-  * Dynamic Array
-  * Hash Table
-  * Immutable Stack
-  * Lock-Free Stack
+    * Linear
+* Graph
+  * Breadth-first search
+  * Depth-first search
+  * Dijkstra
+* String
+  * Knuth-Morris-Pratt
+* Simulated Annealing
+  * Travelling salesman problem
+* Sorting (ascending and descending order)
+  * Bubble
+  * Cocktail
+  * Gnome
+  * Heap
+  * Insertion
+  * Merge
+  * Quick
+  * Selection
+  * Shell
+
+**Data Structures**
+* Graph
+* Heap
+  * Binary
+  * Binomial
+* Matrix
+* Tree
+  * AVL
+  * Red-black
+* Disjoint Set
+* Doubly Linked List
+* Dynamic Array
+* Hash Table
+* Immutable Stack
+* Lock-Free Stack
+
+**Design Patterns**
+* Creational
+  * Factory Method
+* Structural
+* Behavioral
 
 ## License
 Copyright (c) 2020 Ilya Moshanov
