@@ -56,12 +56,12 @@ Prerequisites:
   * Array
     * Binary
     * Linear
-* Graph
-  * Breadth-first search
-  * Depth-first search
-  * Dijkstra
-* String
-  * Knuth-Morris-Pratt
+  * Graph
+    * Breadth-first search
+    * Depth-first search
+    * Dijkstra
+  * String
+    * Knuth-Morris-Pratt
 * Simulated Annealing
   * Travelling salesman problem
 * Sorting (ascending and descending order)
@@ -99,6 +99,6 @@ Prerequisites:
   * Strategy
 
 ## License
-Copyright (c) 2020 Ilya Moshanov
+Copyright (c) 2021 Ilya Moshanov
 
 Licensed under the [MIT License](./LICENSE).
