@@ -96,6 +96,7 @@ Prerequisites:
   * Factory Method
 * Structural
 * Behavioral
+  * Strategy
 
 ## License
 Copyright (c) 2020 Ilya Moshanov
