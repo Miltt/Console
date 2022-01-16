@@ -95,6 +95,7 @@ Prerequisites:
 * Creational
   * Factory Method
 * Structural
+  * Adapter 
 * Behavioral
   * Strategy
 
