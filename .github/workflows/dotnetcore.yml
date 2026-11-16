@@ -1,20 +1,23 @@
-name: .NETCore
+name: .NET Core
 
-on: [push]
-
-permissions:
-  contents: read
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
+    env:
+      DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: 1
+
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 3.0.101
+        dotnet-version: '3.1.x' # Keep your existing version here if already specified
     - name: Build with dotnet
       run: dotnet build --configuration Release
