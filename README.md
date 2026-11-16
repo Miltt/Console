@@ -1,5 +1,3 @@
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/Miltt/Console)](https://github.com/Miltt/Console/releases/tag/v2.0)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Miltt/Console/.NETCore)](https://github.com/Miltt/Console/actions)
 [![license](https://img.shields.io/github/license/Miltt/Console)](https://github.com/Miltt/Console/blob/master/LICENSE)
 
 # Console
@@ -100,6 +98,6 @@ Prerequisites:
   * Strategy
 
 ## License
-Copyright (c) 2021 Ilya Moshanov
+Copyright (c) 2026 Ilya Moshanov
 
 Licensed under the [MIT License](./LICENSE).
